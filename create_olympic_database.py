@@ -208,21 +208,22 @@ for athlete in athletes:
                                 #I want to put a nan if its not floatable
                                 athlete_database[athlete][comp][day][tla][value] = 0.0
 
-                        #Data does't have E score - doing math
-                        D = athlete_database[athlete][comp][day][tla][order[0]]
-                        Score = athlete_database[athlete][comp][day][tla][order[1]]
-                        #Score is D + E
+                        #My table now has E score dont need to do math
+                        # D = athlete_database[athlete][comp][day][tla][order[0]]
+                        # Score = athlete_database[athlete][comp][day][tla][order[3]]
+                        # #Score is D + E
                         
-                        try:
-                            E = float(Score) - float(D)
-                            #print(f"Score: {float(Score)}, D: {float(D)}")
-                        except:
-                            E = np.nan
-                        #print(E)
-                        try:
-                            athlete_database[athlete][comp][day][tla][Ename] = float(E)
-                        except:
-                            athlete_database[athlete][comp][day][tla][Ename] = str(E)
+                        # try:
+                        #     E = float(Score) - float(D)
+                        #     E = athlete_database[athlete][comp][day][tla][order[1]]
+                        #     #print(f"Score: {float(Score)}, D: {float(D)}")
+                        # except:
+                        #     E = np.nan
+                        # #print(E)
+                        # try:
+                        #     athlete_database[athlete][comp][day][tla][Ename] = float(E)
+                        # except:
+                        #     athlete_database[athlete][comp][day][tla][Ename] = str(E)
         else:
             #they did not compete in this competion
             print(f"{athlete} did not compete at {comp}")
