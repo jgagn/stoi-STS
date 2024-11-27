@@ -176,7 +176,7 @@ def get_color(score, max_score):
 
 # Function to update the bubble plot
 def update_bubble_plot(database, competition, categories, results, apparatus):
-    data = {'x': [], 'y': [], 'category': [], 'size': [], 'name': [], 'score': [], 'color': []}
+    data = {'x': [], 'y': [], 'category': [], 'size': [], 'name': [], 'score': [], 'ND':[], 'color': []}
     
     #filter the data 
 
@@ -213,6 +213,7 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
 
             data['name'].append(name)
             data['score'].append(stats['Score'])
+            data['ND'].append(stats['ND'])
             
             # Make it zero if it's nan
             if math.isnan(stats['Score']):
@@ -237,8 +238,6 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
 def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
     # Filter the database based on selected day and apparatus
     # filtered_data = {name: stats for name, values in database.items() if day in values for app, stats in values[day].items() if app == apparatus}
-    
-    
     
     table_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
     
@@ -270,6 +269,7 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['D score'] = df['D'].map('{:.3f}'.format)
         df['E score'] = df['E'].map('{:.3f}'.format)
         df['Score'] = df['Score'].map('{:.3f}'.format)
+        df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
         
         # create "Category" column with capital "C" and map the acronyms to the full text
         df['Category'] = df['category'].map(database['category_acronyms'])
@@ -278,7 +278,7 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['Rank'] = df.index + 1
         
         # Reorder columns
-        df = df[['Rank', 'Athlete name', 'Category','D score', 'E score', 'Score']]
+        df = df[['Rank', 'Athlete name', 'Category','D score', 'E score','ND' ,'Score']]
         
         # Generate HTML table with highlighted row if a selected athlete is provided
         table_rows = []
@@ -585,13 +585,15 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
     # Customize hover template
     hover_template = (
         "<b>%{hovertext}</b><br>" +
-        "Category: %{customdata}<br>" +
+        "Category: %{customdata[0]}<br>" +
         "D score: %{y:.3f}<br>" +
         "E score: %{x:.3f}<br>" +
+        "ND: %{customdata[1]:.1f}<br>" +
         "Score: %{text:.3f}"
     )
-    
-    fig.update_traces(hovertemplate=hover_template, customdata=data['category'])
+    # Ensure customdata is a list of [category, ND] pairs for each point
+    customdata = list(zip(data['category'], data['ND']))
+    fig.update_traces(hovertemplate=hover_template, customdata=customdata)
     
     # Update color bar legend
     fig.update_coloraxes(colorbar_title="Score")
