@@ -16,10 +16,10 @@ import numpy as np
 from termcolor import colored, cprint
 from tabulate import tabulate
 #%% global variables
-tlas = ["FX","PH","SR","VT","PB","HB","AA"]
+tlas = ["FX","PH","SR","VT1","PB","HB","AA"]
 order = ["D","Score","Rank"]
 Ename = "E"
-apparatus = ["Floor","Pommel Horse","Rings","Vault","Parallel Bars","High Bar","AllAround"]
+apparatus = ["Floor","Pommel Horse","Rings","Vault #1","Parallel Bars","High Bar","AllAround"]
 
 #%% Algorithm to Calculate Team Scores
 

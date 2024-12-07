@@ -8,8 +8,6 @@ Created on Tue Mar 26 13:38:51 2024
 
 #%% gymcomp R3
 
-
-
 #2024-10-01
 # upgrading for olympic data
 # will now have Neutral Deductions/Penalty to account for
@@ -676,7 +674,7 @@ def generate_subplot(athlete):
     
     #start by intitiating plot
     # Create subplot with independent y-axes
-    fig = make_subplots(rows=7, cols=1, shared_xaxes=True) #, subplot_titles=tlas)
+    fig = make_subplots(rows=8, cols=1, shared_xaxes=True) #, subplot_titles=tlas)
     
     #if we've selected an athlete, then proceed
     if athlete and athlete not in exclude_keys:
@@ -758,7 +756,7 @@ def generate_subplot(athlete):
         # fig.update_xaxes(title='Competitions', row=7, col=1)
         
         # add x-axis and y axis labels 
-        for i in range(1, 8):
+        for i in range(1, 9):
             fig.update_xaxes(showticklabels=True, row=i, col=1)
             fig.update_yaxes(title=tlas[i-1], row=i, col=1)
     else:
@@ -786,7 +784,7 @@ def generate_subplot(athlete):
         
         
         # add x-axis and y axis labels 
-        for i in range(1, 8):
+        for i in range(1, 9):
             fig.update_xaxes(showticklabels=False, row=i, col=1)
             fig.update_yaxes(title=tlas[i-1], row=i, col=1)
             
@@ -945,7 +943,7 @@ def update_score_graph(athlete, competition, results):
             # athlete = database[athlete][competition]
             d_scores = []
             e_scores = []
-            plot_apparatus = ['FX','PH','SR','VT','PB','HB']
+            plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
             
             for app in plot_apparatus:
                 d_scores.append(database[athlete][competition][result][app]['D'])
@@ -1054,17 +1052,17 @@ def update_subplot(athlete):
 
 
 # Header for the table
-header = ['Athlete', 'FX', 'PH', 'SR', 'VT', 'PB', 'HB', 'AA']
+header = ['Athlete', 'FX', 'PH', 'SR', 'VT1', 'PB', 'HB', 'AA']
 # header = ['Athlete', 'FX', 'FX_status', 'PH', 'PH_status', 'SR', 'SR_status', 'VT', 'VT_status', 'PB', 'PB_status', 'HB', 'HB_status', 'AA']
 
 # Define the color dictionary
 colour_dict = {"dropped": "#FFFFCC", "scratch": "grey", "counting": "green"}
 
 # Define hidden columns and conditional formatting based on status
-hidden_columns = [f'{event}_status' for event in ['FX', 'PH', 'SR', 'VT', 'PB', 'HB']]
+hidden_columns = [f'{event}_status' for event in ['FX', 'PH', 'SR', 'VT1', 'PB', 'HB']]
 style_data_conditional = []
 
-for event in ['FX', 'PH', 'SR', 'VT', 'PB', 'HB']:
+for event in ['FX', 'PH', 'SR', 'VT1', 'PB', 'HB']:
     for status, color in colour_dict.items():
         style_data_conditional.append(
             {
@@ -1516,7 +1514,7 @@ def generate_tables(n_clicks, competition, categories, results, xx_value, yy_val
             # new_team_scores = team_score_calcs(comp_format,team,database,print_table=False)
         
             #created table 
-            tlas=['FX','PH','SR','VT','PB','HB','AA']
+            tlas=['FX','PH','SR','VT1','PB','HB','AA']
             team = combined[i][1]
             
             team_scores = team_score_calcs(comp_format,team,database,competition,results=results,print_table=False)
