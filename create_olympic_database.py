@@ -21,7 +21,8 @@ import chardet #to detect character encoding - making sure accents and such are 
 
 #file path and csv file name
 path = "test_data/OlympicData"
-csv_file = "Olympic_test1.csv"
+#csv_file = "Olympic_test1.csv"
+csv_file = "Olympic_test2.csv"
 
 # Detect the encoding
 with open(path+"/"+csv_file, 'rb') as f:
