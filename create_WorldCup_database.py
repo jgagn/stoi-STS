@@ -54,7 +54,7 @@ competition_dates = {
 #%% Rename column headers
 # the format is a bit silly, where there are two levels of headers
 # the key is that the data goes D score, Score and Rank
-order = ["D","E","ND","Score"]
+order = ["D","E","ND","Bonus","Score"]
 Ename = "E"
 # apparatus = ["Floor","Pommel Horse","Rings","Vault","Parallel Bars","High Bar","AllAround"]
 

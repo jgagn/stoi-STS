@@ -180,7 +180,7 @@ def get_color(score, max_score):
 
 # Function to update the bubble plot
 def update_bubble_plot(database, competition, categories, results, apparatus):
-    data = {'x': [], 'y': [], 'category': [], 'size': [], 'name': [], 'score': [], 'ND':[], 'color': []}
+    data = {'x': [], 'y': [], 'category': [], 'size': [], 'name': [], 'score': [], 'ND':[], 'Bonus':[],  'color': []}
     
     #filter the data 
 
@@ -200,43 +200,48 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
         # print(f"max score: {max_score}")
         exp = 3  # Adjust this as needed
         
-        
         for name, stats in bubble_data.items():
-            # print(f"name: {name}")
-            # print(f"stats: {stats}")
-            #I've already filtered the apparatus
-            if stats['E'] == 0.0:
-                data['x'].append(np.nan)
-            else:
-                data['x'].append(stats['E'])
-
-            if stats['D'] == 0.0:
-                data['y'].append(np.nan)
-            else:
-                data['y'].append(stats['D'])
-
-            data['name'].append(name)
-            data['score'].append(stats['Score'])
-            data['ND'].append(stats['ND'])
             
-            # Make it zero if it's nan
-            if math.isnan(stats['Score']):
-                size = 0.0
-                color = 0.0
+            if np.isnan(stats['E']):
+                pass
             else:
-                size = stats['Score']
-                color = stats['Score']
+                # print(f"name: {name}")
+                # print(f"stats: {stats}")
+                #I've already filtered the apparatus
+                if stats['E'] == 0.0:
+                    data['x'].append(np.nan)
+                else:
+                    data['x'].append(stats['E'])
+    
+                if stats['D'] == 0.0:
+                    data['y'].append(np.nan)
+                else:
+                    data['y'].append(stats['D'])
+    
+                data['name'].append(name)
+                data['score'].append(stats['Score'])
+                data['ND'].append(stats['ND'])
+                data['Bonus'].append(stats['Bonus'])
                 
-            data['color'].append(get_color(color ** exp, max_score ** exp))
-                
-            size_exp = 1.5
-            if apparatus == "AA":
-                data['size'].append((size / 6) ** size_exp)
-            else:
-                data['size'].append(size ** size_exp)
-                
-            #add category data
-            data['category'].append(stats['category'])
+                # Make it zero if it's nan
+                if math.isnan(stats['Score']):
+                    size = 0.0
+                    color = 0.0
+                else:
+                    size = stats['Score']
+                    color = stats['Score']
+                    
+                data['color'].append(get_color(color ** exp, max_score ** exp))
+                    
+                size_exp = 1.5
+                if apparatus == "AA":
+                    data['size'].append((size / 6) ** size_exp)
+                else:
+                    data['size'].append(size ** size_exp)
+                    
+                #add category data
+                data['category'].append(stats['category'])
+        print(data)
     return data
 
 def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
@@ -274,6 +279,7 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['E score'] = df['E'].map('{:.3f}'.format)
         df['Score'] = df['Score'].map('{:.3f}'.format)
         df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
+        df['Bonus'] = df['Bonus'].map('{:.1f}'.format) #1 decimal point for bonus
         
         # create "Category" column with capital "C" and map the acronyms to the full text
         df['Category'] = df['category'].map(database['category_acronyms'])
@@ -282,7 +288,7 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['Rank'] = df.index + 1
         
         # Reorder columns
-        df = df[['Rank', 'Athlete name', 'Category','D score', 'E score','ND' ,'Score']]
+        df = df[['Rank', 'Athlete name', 'Category','D score', 'E score','ND' ,'Bonus','Score']]
         
         # Generate HTML table with highlighted row if a selected athlete is provided
         table_rows = []
@@ -593,10 +599,11 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
         "D score: %{y:.3f}<br>" +
         "E score: %{x:.3f}<br>" +
         "ND: %{customdata[1]:.1f}<br>" +
+        "Bonus: %{customdata[2]:.1f}<br>" +
         "Score: %{text:.3f}"
     )
     # Ensure customdata is a list of [category, ND] pairs for each point
-    customdata = list(zip(data['category'], data['ND']))
+    customdata = list(zip(data['category'], data['ND'], data['Bonus']))
     fig.update_traces(hovertemplate=hover_template, customdata=customdata)
     
     # Update color bar legend
