@@ -59,7 +59,7 @@ Ename = "E"
 # apparatus = ["Floor","Pommel Horse","Rings","Vault","Parallel Bars","High Bar","AllAround"]
 
 #create a dictionary where the csv appartus names are keys to desired apparatus abbreviation values
-#two-letter acronyms we want to use
+#two-letter acronyms we want to use No AA in WCs leaving in for now!
 tlas = ["FX","PH","SR","VT1","VT2","PB","HB","AA"]
 
 # abbrev_dict = {apparatus[0]:tlas[0],
@@ -138,9 +138,6 @@ for comp in competitions:
         
         comp_overview[comp][category] = results 
         
-        
-        
-    
 #%% Organize into athlete specific database
 
 athlete_database = {}

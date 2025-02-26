@@ -114,7 +114,7 @@ app.title = "STOI Demo"
 dropdown_style = {'width': '50%'}  # Adjust the width as needed
 dropdown_style1 = {'width': '100%'}  # Adjust the width as needed
 dropdown_style2 = {'width': '80%'}  # Adjust the width as needed
-tlas = ['FX', 'PH', 'SR', 'VT1','VT2', 'PB', 'HB', 'AA']
+tlas = ['FX', 'PH', 'SR', 'VT1','VT2', 'PB', 'HB'] #remove AA for World cups, 'AA']
 exclude_keys = ["overview", "competition_acronyms", "category_acronyms","competition_dates"]
 tla_dict = {
             "FX":"Floor Exercise",
@@ -124,7 +124,7 @@ tla_dict = {
             "VT2":"Vault 2",
             "PB":"Parallel Bars",
             "HB":"Horizontal Bar",
-            "AA":"All Around",
+            # "AA":"All Around",
                 }
 
 #%% Helpful functions
@@ -376,7 +376,7 @@ overview_layout = html.Div([
                     dcc.Dropdown(
                         id='apparatus-dropdown',
                         options=[{'label': tla_dict[app], 'value': app} for app in tlas],
-                        value='AA',
+                        value='FX',#used to have AA as default but changing for World Cups
                         style=dropdown_style1
                     )
                 ], style={'marginBottom': '10px'})
@@ -680,7 +680,7 @@ def generate_subplot(athlete):
     
     #start by intitiating plot
     # Create subplot with independent y-axes
-    fig = make_subplots(rows=8, cols=1, shared_xaxes=True) #, subplot_titles=tlas)
+    fig = make_subplots(rows=7, cols=1, shared_xaxes=True) #, subplot_titles=tlas)
     
     #if we've selected an athlete, then proceed
     if athlete and athlete not in exclude_keys:
@@ -762,7 +762,7 @@ def generate_subplot(athlete):
         # fig.update_xaxes(title='Competitions', row=7, col=1)
         
         # add x-axis and y axis labels 
-        for i in range(1, 9):
+        for i in range(1, 8): #used to have 9, changed as we dropped AA
             fig.update_xaxes(showticklabels=True, row=i, col=1)
             fig.update_yaxes(title=tlas[i-1], row=i, col=1)
     else:
@@ -790,7 +790,7 @@ def generate_subplot(athlete):
         
         
         # add x-axis and y axis labels 
-        for i in range(1, 9):
+        for i in range(1, 8): #changed from 9 to 8 when dropped AA for world cups
             fig.update_xaxes(showticklabels=False, row=i, col=1)
             fig.update_yaxes(title=tlas[i-1], row=i, col=1)
             
