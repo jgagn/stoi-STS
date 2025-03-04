@@ -22,7 +22,8 @@ import chardet #to detect character encoding - making sure accents and such are 
 #file path and csv file name
 path = "test_data/WorldCups2025"
 #csv_file = "Olympic_test1.csv"
-csv_file = "CottbusEF.csv"
+# csv_file = "CottbusEF.csv"
+csv_file = "WorldCups2025.csv"
 
 # Detect the encoding
 with open(path+"/"+csv_file, 'rb') as f:
@@ -40,13 +41,18 @@ database = pd.read_csv(path+"/"+csv_file, encoding=encoding)
 #%% Acronyms
 
 competition_acronyms = {
-                    "Cottbus": "Cottbus World Cup"
+                    # "2025 World Cup Series": "2025 World Cup Series"
+                    # "EF":"Event Finals",
+                    # "QF":"Qualifications",
+                    "Cottbus": "Cottbus"
                     }
 
 category_acronyms = {"SR":"Senior",
                      }
 competition_dates = {
-                    "Cottbus": "2025-02-23",
+                    "Cottbus": "2025-02-21",
+                    # "QF": "2025-02-21",
+                    # "EF": "2025-02-23",
                     # "TF": "2024-07-02",
                     # "AA": "2024-07-03",
                     # "EF": "2024-07-04",
@@ -302,7 +308,8 @@ for athlete in athletes:
 #%% I want to pickle my database 
 
 # File path to save the pickled database
-database_filename = "CottbusEF_mag_athletes"
+# database_filename = "CottbusEF_mag_athletes"
+database_filename = "WorldCups2025_athletes"
 file_path = path+"/"+database_filename
 
 # Pickle the database

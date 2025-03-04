@@ -63,7 +63,8 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the absolute path to the file
 #file path and csv file name
 path = "test_data/WorldCups2025"
-pkl_file = "CottbusEF_mag_athletes"
+# pkl_file = "CottbusEF_mag_athletes"
+pkl_file = "WorldCups2025_athletes"
 
 file_path = os.path.join(base_dir, path+"/"+pkl_file)
 
@@ -79,13 +80,13 @@ with open(file_path, 'rb') as f:
 # print("Database loaded successfully.")
 
 #%%  Function to calculate the color based on the score
-def get_color(score, max_score):
-    if math.isnan(score):
-        return 'black'  # or any other default color
-    else:
-        # Calculate the color based on the score and max score
-        color_value = score / max_score
-        return color_value
+# def get_color(score, max_score):
+#     if math.isnan(score):
+#         return 'black'  # or any other default color
+#     else:
+#         # Calculate the color based on the score and max score
+#         color_value = score / max_score
+#         return color_value
 
 #%% Setup App, Title, Authentication
 app = dash.Dash(__name__, suppress_callback_exceptions=True) #, external_stylesheets=[dbc.themes.MORPH])
@@ -170,12 +171,15 @@ def get_category_data_for_competition_day(database, competition, categories, res
 #%% Tab 1: Competition Overview ###
 ###################################
 # Function to calculate the color based on the score
-def get_color(score, max_score):
+def get_color(score, min_score, max_score):
+    print(f"score: {score}")
+    print(f"min_score: {min_score}")
+    print(f"max_score: {max_score}")
     if math.isnan(score):
         return 'black'  # or any other default color
     else:
         # Calculate the color based on the score and max score
-        color_value = score / max_score
+        color_value = score / (max_score - min_score)
         return color_value
 
 # Function to update the bubble plot
@@ -195,14 +199,15 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
         # print(bubble_data)
         
         #TODO change this max score thing likely
-        max_score = max([values['Score'] for values in bubble_data.values()])
+        max_score = np.nanmax([values['Score'] for values in bubble_data.values()])
+        min_score = np.nanmin([values['Score'] for values in bubble_data.values()])
         # max_score = 16
         # print(f"max score: {max_score}")
         exp = 3  # Adjust this as needed
         
         for name, stats in bubble_data.items():
             
-            if np.isnan(stats['E']):
+            if np.isnan(stats['E']) or stats['E']==0.0:
                 pass
             else:
                 # print(f"name: {name}")
@@ -231,7 +236,7 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
                     size = stats['Score']
                     color = stats['Score']
                     
-                data['color'].append(get_color(color ** exp, max_score ** exp))
+                data['color'].append(get_color(color ** exp, min_score, max_score ** exp))
                     
                 size_exp = 1.5
                 if apparatus == "AA":
@@ -290,6 +295,10 @@ def update_table(database, competition, categories, results, apparatus, selected
         # Reorder columns
         df = df[['Rank', 'Athlete name', 'Category','D score', 'E score','ND' ,'Bonus','Score']]
         
+        # Remove rows where 'E score' is NaN or 0.0
+        df_cleaned = df[~(df['E score'].isna() | (df['E score'] == 0.0))]
+        df = df_cleaned
+        
         # Generate HTML table with highlighted row if a selected athlete is provided
         table_rows = []
         for i in range(len(df)):
@@ -315,6 +324,7 @@ def update_table(database, competition, categories, results, apparatus, selected
 # Sort competitions by date (newest first)
 sorted_competitions = sorted(database['competition_dates'].keys(), key=lambda x: datetime.strptime(database['competition_dates'][x], '%Y-%m-%d'), reverse=True)
 
+print(f"comp; {sorted_competitions}")
 # Create options for competition dropdown
 competition_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in sorted_competitions]
 
