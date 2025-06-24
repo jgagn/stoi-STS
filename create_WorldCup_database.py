@@ -44,13 +44,14 @@ competition_acronyms = {
                     # "2025 World Cup Series": "2025 World Cup Series"
                     # "EF":"Event Finals",
                     # "QF":"Qualifications",
-                    "Cottbus": "Cottbus"
+                    # "Cottbus": "Cottbus"
+                    "WCups2025": "World Cup Series 2025"
                     }
 
 category_acronyms = {"SR":"Senior",
                      }
 competition_dates = {
-                    "Cottbus": "2025-02-21",
+                    "WCups2025": "2025-02-21",
                     # "QF": "2025-02-21",
                     # "EF": "2025-02-23",
                     # "TF": "2024-07-02",
