@@ -5,6 +5,19 @@ Created on Mon Feb 24 17:49:30 2025
 
 @author: joelgagnon
 """
+#%%
+# some notes:
+#     There is inconsistencies between books:
+#     some have penalty first, bonus second, others vice versa
+# some books have commas between names, others dont!
+# some country codes not in the list... kind of want to get rid of that check
+# some books dont have "RANK" at the top, instead No.
+
+#Osijek and Cairo, data problems with vault
+#Doha doesnt work well for some DNS results - need to decide how to treat that
+#%%
+
+
 import os
 from country_codes import VALID_COUNTRY_CODES
 import pdfplumber
@@ -13,43 +26,52 @@ import re  # For checking country codes
 
 path = "test_data/WorldCups2025"
 competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-competitions = ["COTTBUS"]
+competitions = ["COTTBUS","BAKU","ANTALYA","DOHA"] #osijek and cairo have vault problems
 events = ["FX","PH","SR","VT","PB","HB"]
 # events = ["VT"]
 days = ["QF","EF"]
 # days = ["QF"]
 
+
+
 #create some dictionaries that contain page numbers on pdf for the events
-Cottbus_dict = {"QF":{
-                     "FX":[12],
-                     "PH":[15],
-                     "SR":[17],
-                     "VT":[19,20],
-                     "PB":[22],
-                     "HB":[24],
-                     },
-                "EF":{
-                     "FX":[26],
-                     "PH":[28],
-                     "SR":[30],
-                     "VT":[32],
-                     "PB":[34],
-                     "HB":[36],
-                     },
+Cottbus_dict = {"QF":{"FX":[12],"PH":[15],"SR":[17],"VT":[19,20],"PB":[22],"HB":[24]},
+                "EF":{"FX":[26],"PH":[28],"SR":[30],"VT":[32],"PB":[34],"HB":[36]},
                 }
             
+Baku_dict = {"QF":{"FX":[29],"PH":[30],"SR":[32],"VT":[34],"PB":[35],"HB":[37]},
+             "EF":{"FX":[41],"PH":[43],"SR":[45],"VT":[47],"PB":[49],"HB":[51]},
+                }
 
+Antalya_dict = {"QF":{"FX":[16],"PH":[18],"SR":[20],"VT":[22],"PB":[23],"HB":[25]},
+                "EF":{"FX":[35],"PH":[36],"SR":[38],"VT":[39],"PB":[40],"HB":[41]},
+                }
+
+Osijek_dict = {"QF":{"FX":[20],"PH":[22,23],"SR":[25],"VT":[27,28],"PB":[29],"HB":[31]},
+               "EF":{"FX":[40],"PH":[43],"SR":[45],"VT":[47],"PB":[50],"HB":[52]},
+                }
+
+Doha_dict = {"QF":{"FX":[17],"PH":[18],"SR":[19],"VT":[20],"PB":[21],"HB":[22]},
+             "EF":{"FX":[30],"PH":[31],"SR":[32],"VT":[34],"PB":[35],"HB":[36]},
+                }
+
+Cairo_dict = {"QF":{"FX":[33],"PH":[34],"SR":[35],"VT":[36],"PB":[37],"HB":[38]},
+              "EF":{"FX":[47],"PH":[48],"SR":[49],"VT":[50],"PB":[51],"HB":[52]},
+              }
 
 #create nested dictionary
 wc_dict = {
     "COTTBUS": Cottbus_dict,
-    "DOHA": "temp",
-    "OSIJEK": "temp",
-    "BAKU": "temp",
-    "CAIRO": "temp",
-    "ANTALYA": "temp",
+    "DOHA": Doha_dict,
+    "OSIJEK": Osijek_dict,
+    "BAKU": Baku_dict,
+    "CAIRO": Cairo_dict,
+    "ANTALYA": Antalya_dict,
 }
 
+
+#keywords to search for beginning of table
+keywords = ["RANK","NO.","#"]
 
 for comp in competitions:
     print("=============")
@@ -73,7 +95,12 @@ for comp in competitions:
                 
                     # Find the index where "RANK" appears and start from the next line
                     lines = text.split("\n")
-                    start_idx = next((i for i, line in enumerate(lines) if "RANK" in line.upper()), None)
+                    # start_idx = next((i for i, line in enumerate(lines) if "RANK" in line.upper()), None)
+                    
+                    # start_idx = next((i for i, line in enumerate(lines) if "RANK" in line.upper() or "NO." in line.upper()), None)
+                    
+                    start_idx = next((i for i, line in enumerate(lines) if any(keyword in line.upper() for keyword in keywords)), None)
+
                     
                     # if start_idx is not None and start_idx + 1 < len(lines):
                     if start_idx + 1 < len(lines):
