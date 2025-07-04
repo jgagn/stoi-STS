@@ -261,4 +261,11 @@ VALID_COUNTRY_CODES =  ["ABW",
                         "SLO",
                         "LAT",
                         "PUR",
+                        #adding more
+                        "BUL",
+                        "AIN", #neutral athlete?
+                        "CRO",
+                        "SUI",
+                        "ALG",
+                        "MAS",
                         ]

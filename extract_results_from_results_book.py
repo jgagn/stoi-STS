@@ -26,7 +26,8 @@ import re  # For checking country codes
 
 path = "test_data/WorldCups2025"
 competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-competitions = ["COTTBUS","BAKU","ANTALYA","DOHA"] #osijek and cairo have vault problems
+competitions = ["COTTBUS","BAKU","ANTALYA","DOHA"] 
+#osijek and cairo have vault problems
 events = ["FX","PH","SR","VT","PB","HB"]
 # events = ["VT"]
 days = ["QF","EF"]
