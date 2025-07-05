@@ -32,7 +32,7 @@ competitions = ["COTTBUS"]
 # events = ["FX","PH","SR","VT","PB","HB"]
 events = ["VT"]
 days = ["QF","EF"]
-# days = ["QF"]
+days = ["QF"]
 
 
 
@@ -108,201 +108,226 @@ for comp in competitions:
             for event in events:
                 print(f"   {event}")
                 pages_to_extract = wc_dict[comp][day][event]
+                table_data = []
                 for j,page_number in enumerate(pages_to_extract):
                     page = pdf.pages[page_number]
                     text = page.extract_text()
-            
-                
-                    # Find the index where "RANK" appears and start from the next line
-                    lines = text.split("\n")
-                    # start_idx = next((i for i, line in enumerate(lines) if "RANK" in line.upper()), None)
-                    
-                    # start_idx = next((i for i, line in enumerate(lines) if "RANK" in line.upper() or "NO." in line.upper()), None)
-                    
-                    start_idx = next((i for i, line in enumerate(lines) if any(keyword in line.upper() for keyword in keywords)), None)
 
+                    lines = text.split("\n")
                     
+                    if j==0:
+                        start_idx = next((i for i, line in enumerate(lines) if any(keyword in line.upper() for keyword in keywords)), None)
+                    else:
+                        #in this case, we are on the second page, and the start idx could be Vault 1 or Vault 2
+                        special_keywords = keywords + ["Vault"]
+                        start_idx = next((i for i, line in enumerate(lines) if any(keyword in line.upper() for keyword in special_keywords)), None)
                     # if start_idx is not None and start_idx + 1 < len(lines):
+                        
                     if start_idx + 1 < len(lines):
-                        table_data = lines[start_idx + 1 :]  # Start from the next line
+                        page_data = lines[start_idx + 1 :]  # Start from the next line
                     else:
                         print("Table start not found.")
-                        table_data = []
+                        page_data = []
+                    #add table_data to all_table_data    
+                    table_data.extend(page_data)
                     
-
-                    
-                    # Process table data, ignoring lines that start with "Print"
-                    cleaned_data = []
-                    
-                    if event == "VT":  # Special handling for Vault
-                        i = 0
-                        while i < len(table_data):
-                            row = table_data[i].strip()
-            
-                            if not row or row.startswith("Print"):
-                                i += 1
-                                continue  # Skip empty or unwanted lines
-            
-                            split_row = row.split()
-            
-                            if len(split_row) < 3 or not split_row[0].isdigit():
-                                i += 1
-                                continue  # Skip invalid rows
-                            
-                            # Extract Rank, BIB, Name, Country, and Total Score
-                            rank = split_row[0]
-                            bib_number = split_row[1]
-                            name_parts = split_row[2:-2]  # Everything except last two (country, total score)
-                            country = split_row[-2]
-                            total_score = split_row[-1].replace(",", ".")
-            
-                            full_name = " ".join(name_parts).strip()
-                            last_name, first_name = full_name.split(",", 1) if "," in full_name else (full_name, "")
-                            
-                            #Trying to change the vault data
-                            #typically it has the world Vault 1 and Vault 2 
-                            #afterwards there could be up to 5 entries
-                            
-                            # Move to Vault 1 details
+                #Noe
+                # Process table data, ignoring lines that start with "Print"
+                cleaned_data = []
+                
+                if event == "VT":  # Special handling for Vault
+                    i = 0
+                    while i < len(table_data):
+                        row = table_data[i].strip()
+        
+                        if not row or row.startswith("Print"):
                             i += 1
-                            vault1 = format_scores(table_data[i].split()[2:]) #the [2:] makes sure we remove the first two entries "Vault" and "1"
-                            
-                            #right away let
-                            D1, E1, Penalty1, Bonus1, Score1 = ["", "", "", "", ""]
-                            
-                            # Remove "Vault 1" if it's mistakenly captured
-                            
-
-                            D1, E1, *rest, Score1 = vault1
-                            print(f"D1: {D1}")
-                            if not is_score(D1):  # Ensure it's a valid score
-                                D1 = ""
-                            if not is_score(E1):  # Ensure it's a valid score
-                                E1 = ""
-                            Score1 = Score1.replace(",", ".")  # Convert decimal comma to period
-                            for val in rest:
-                                if "-" in val or val.startswith("0,"):
-                                    Penalty1 = val.replace(",", ".")
-                                elif "+" in val:
-                                    Bonus1 = val.replace(",", ".")
-                            
-                            # Move to Vault 2 details
+                            continue  # Skip empty or unwanted lines
+        
+                        split_row = row.split()
+        
+                        if len(split_row) < 3 or not split_row[0].isdigit():
                             i += 1
-                            vault2 = format_scores(table_data[i].split()[2:])
-                            vault2 = table_data[i].split()[2:]
-                            D2, E2, Penalty2, Bonus2, Score2 = ["", "", "", "", ""]
+                            continue  # Skip invalid rows
+                        
+                        # Extract Rank, BIB, Name, Country, and Total Score
+                        rank = split_row[0]
+                        bib_number = split_row[1]
+                        name_parts = split_row[2:-2]  # Everything except last two (country, total score)
+                        country = split_row[-2]
+                        total_score = split_row[-1].replace(",", ".")
+        
+                        full_name = " ".join(name_parts).strip()
+                        last_name, first_name = full_name.split(",", 1) if "," in full_name else (full_name, "")
+                        
+                        #Trying to change the vault data
+                        #typically it has the world Vault 1 and Vault 2 
+                        #afterwards there could be up to 5 entries
+                        
+                        # Move to Vault 1 details
+                        i += 1
+                        
+                        #check that the first entry says Vault
+                        
+                        counter = 0
+                        while table_data[i].split()[0]!="Vault":
+                            counter+=1
+                            i+=1
+                            if counter > 10:
+                                print("while loop for vault checker took over 10 times bro check line 177")
+                                break
                             
-                            # Remove "Vault 2" if it's mistakenly captured
-                            # vault2 = [v for v in vault2 if "Vault" not in v]
-                            
-                            
-                            D2, E2, *rest, Score2 = vault2
-                            if not is_score(D2):  # Ensure it's a valid score
-                                D2 = ""
-                            if not is_score(E2):  # Ensure it's a valid score
-                                E2 = ""
-                            Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
-                            for val in rest:
-                                if "-" in val or val.startswith("0,"):
-                                    Penalty2 = val.replace(",", ".")
-                                elif "+" in val:
-                                    Bonus2 = val.replace(",", ".")
-            
-                            # Store cleaned data
-                            cleaned_data.append([rank, bib_number, last_name.strip(), first_name.strip(), country,
-                                                 D1, E1, Penalty1, Bonus1, Score1,
-                                                 D2, E2, Penalty2, Bonus2, Score2, total_score])
-            
-                            i += 1  # Move to next entry
+                        vault1 = format_scores(table_data[i].split()[2:]) #the [2:] makes sure we remove the first two entries "Vault" and "1"
                         
-                        # Convert VT data into DataFrame
-                        df = pd.DataFrame(cleaned_data, columns=["Rank", "BIB", "Last Name", "First Name", "Country",
-                                                                 "D1", "E1", "Penalty1", "Bonus1", "Score1",
-                                                                 "D2", "E2", "Penalty2", "Bonus2", "Score2",
-                                                                 "Total Score"])
-                    else: #any event except vault
-                        for row in table_data:
-                            if row.strip().startswith("Print"):  # Ignore "Print" lines
-                                continue
-                            
-                            split_row = row.split()
+                        #right away let
+                        D1, E1, Penalty1, Bonus1, Score1 = ["", "", "", "", ""]
                         
-                            if not split_row:
-                                continue  # Skip empty rows
+                        # Remove "Vault 1" if it's mistakenly captured
                         
-                            # Remove first column if it contains only numbers (rank)
-                            if split_row[0].isdigit():
-                                split_row.pop(0)
+
+                        D1, E1, *rest, Score1 = vault1
+
+                        if not is_score(D1):  # Ensure it's a valid score
+                            D1 = ""
+                        if not is_score(E1):  # Ensure it's a valid score
+                            E1 = ""
+                        Score1 = Score1.replace(",", ".")  # Convert decimal comma to period
+
+                        for value in rest:
+                            clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
+                            if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
+                                Penalty1 = format_scores([clean_value])[0]
+                            elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
+                                Bonus1 = format_scores([clean_value])[0]
                         
-                            # Identify the country code index
-                            country_idx = next((i for i, entry in enumerate(split_row) if is_country_code(entry)), None)
+                        # Move to Vault 2 details
+                        i += 1
                         
-                            if country_idx is None:
-                                print(f"check if {split_row} has a valid country code")
-                                continue  # Skip row if no country code found
+                        counter = 0
+                        while table_data[i].split()[0]!="Vault":
+                            counter+=1
+                            i+=1
+                            if counter > 10:
+                                print("while loop for vault checker took over 10 times bro check line 209")
+                                break
                         
-                            # Extract BIB number (first entry)
-                            bib_number = split_row[0]
+                        vault2 = format_scores(table_data[i].split()[2:])
+                        vault2 = table_data[i].split()[2:]
+                        D2, E2, Penalty2, Bonus2, Score2 = ["", "", "", "", ""]
                         
-                            # Everything between BIB and country code is the full name
-                            full_name_parts = split_row[1:country_idx]
-                            
-                            # Join into a single string
-                            full_name = " ".join(full_name_parts).strip()
-                            
-                            # Handle Last Name and First Name correctly
-                            if "," in full_name:
-                                parts = full_name.split(",", maxsplit=1)  # Split at the first comma
-                                last_name = parts[0].strip()  # Everything before the comma (Last Name)
-                                first_name = parts[1].strip()  # Everything after the comma (First Name)
+                        # Remove "Vault 2" if it's mistakenly captured
+                        # vault2 = [v for v in vault2 if "Vault" not in v]
+                        
+                        
+                        D2, E2, *rest, Score2 = vault2
+                        if not is_score(D2):  # Ensure it's a valid score
+                            D2 = ""
+                        if not is_score(E2):  # Ensure it's a valid score
+                            E2 = ""
+                        Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
+
+                        for value in rest:
+                            clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
+                            if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
+                                Penalty2 = format_scores([clean_value])[0]
+                            elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
+                                Bonus2 = format_scores([clean_value])[0]
+        
+                        # Store cleaned data
+                        cleaned_data.append([rank, bib_number, last_name.strip(), first_name.strip(), country,
+                                             D1, E1, Penalty1, Bonus1, Score1,
+                                             D2, E2, Penalty2, Bonus2, Score2, total_score])
+        
+                        i += 1  # Move to next entry
+                    
+                    # Convert VT data into DataFrame
+                    df = pd.DataFrame(cleaned_data, columns=["Rank", "BIB", "Last Name", "First Name", "Country",
+                                                             "D1", "E1", "Penalty1", "Bonus1", "Score1",
+                                                             "D2", "E2", "Penalty2", "Bonus2", "Score2",
+                                                             "Total Score"])
+                else: #any event except vault
+                    for row in table_data:
+                        if row.strip().startswith("Print"):  # Ignore "Print" lines
+                            continue
+                        
+                        split_row = row.split()
+                    
+                        if not split_row:
+                            continue  # Skip empty rows
+                    
+                        # Remove first column if it contains only numbers (rank)
+                        if split_row[0].isdigit():
+                            split_row.pop(0)
+                    
+                        # Identify the country code index
+                        country_idx = next((i for i, entry in enumerate(split_row) if is_country_code(entry)), None)
+                    
+                        if country_idx is None:
+                            print(f"check if {split_row} has a valid country code")
+                            continue  # Skip row if no country code found
+                    
+                        # Extract BIB number (first entry)
+                        bib_number = split_row[0]
+                    
+                        # Everything between BIB and country code is the full name
+                        full_name_parts = split_row[1:country_idx]
+                        
+                        # Join into a single string
+                        full_name = " ".join(full_name_parts).strip()
+                        
+                        # Handle Last Name and First Name correctly
+                        if "," in full_name:
+                            parts = full_name.split(",", maxsplit=1)  # Split at the first comma
+                            last_name = parts[0].strip()  # Everything before the comma (Last Name)
+                            first_name = parts[1].strip()  # Everything after the comma (First Name)
+                        else:
+                            # If there's no comma, assume the full name is missing a clear split
+                            name_parts = full_name.split()
+                            if len(name_parts) > 1:
+                                last_name = " ".join(name_parts[:-1])  # Everything except the last word
+                                first_name = name_parts[-1]  # The last word is the first name
                             else:
-                                # If there's no comma, assume the full name is missing a clear split
-                                name_parts = full_name.split()
-                                if len(name_parts) > 1:
-                                    last_name = " ".join(name_parts[:-1])  # Everything except the last word
-                                    first_name = name_parts[-1]  # The last word is the first name
-                                else:
-                                    last_name = full_name
-                                    first_name = ""
-                            # Country code
-                            country = split_row[country_idx]
+                                last_name = full_name
+                                first_name = ""
+                        # Country code
+                        country = split_row[country_idx]
+                    
+                        # Convert numeric values (after the country column) from comma to point format
+                        unformatted_scores = split_row[country_idx + 1:]
+                        scores = format_scores(unformatted_scores)
+                        # scores = [val.replace(",", ".") for val in unformatted_scores if is_score(val) or "-" in val or "+" in val or "(" in val]
+                    
+                        # Default structure
+                        D_score, E_score, penalty, bonus, final_score = "", "", "", "", ""
+                    
+                        if len(scores) >= 2:  # At least D & E scores exist
+                            D_score, E_score = scores[:2]
+                    
+                        if len(scores) >= 3:  # Final score is always the last one
+                            final_score = scores[-1]
+                    
+                        # Look for penalties & bonuses in between
+                        middle_scores = scores[2:-1] if len(scores) > 3 else []  # Between E and Final
+                    
+                        for value in middle_scores:
+                            clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
+                            if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
+                                penalty = format_scores([clean_value])[0]
+                            elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
+                                bonus = format_scores([clean_value])[0]
+                    
+                        # Ensure exactly 9 columns per row
+                        cleaned_row = [bib_number, last_name, first_name, country, D_score, E_score, penalty, bonus, final_score]
+                        cleaned_data.append(cleaned_row[:9])  # Trim any extra values
                         
-                            # Convert numeric values (after the country column) from comma to point format
-                            unformatted_scores = split_row[country_idx + 1:]
-                            scores = format_scores(unformatted_scores)
-                            # scores = [val.replace(",", ".") for val in unformatted_scores if is_score(val) or "-" in val or "+" in val or "(" in val]
-                        
-                            # Default structure
-                            D_score, E_score, penalty, bonus, final_score = "", "", "", "", ""
-                        
-                            if len(scores) >= 2:  # At least D & E scores exist
-                                D_score, E_score = scores[:2]
-                        
-                            if len(scores) >= 3:  # Final score is always the last one
-                                final_score = scores[-1]
-                        
-                            # Look for penalties & bonuses in between
-                            middle_scores = scores[2:-1] if len(scores) > 3 else []  # Between E and Final
-                        
-                            for value in middle_scores:
-                                clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
-                                if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
-                                    penalty = clean_value
-                                elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
-                                    bonus = clean_value
-                        
-                            # Ensure exactly 9 columns per row
-                            cleaned_row = [bib_number, last_name, first_name, country, D_score, E_score, penalty, bonus, final_score]
-                            cleaned_data.append(cleaned_row[:9])  # Trim any extra values
-                            
-                            # Convert to DataFrame with proper column names
-                            df = pd.DataFrame(cleaned_data, columns=["BIB", "Last Name", "First Name", "Country", "D Score", "E Score", "Penalty", "Bonus", "Final Score"])
+                        # Convert to DataFrame with proper column names
+                        df = pd.DataFrame(cleaned_data, columns=["BIB", "Last Name", "First Name", "Country", "D Score", "E Score", "Penalty", "Bonus", "Final Score"])
+                
                     
                     
-                    
-                    # Save to CSV or print
-                    # Create directory if it doesn't exist
-                    os.makedirs(comp+"_csv", exist_ok=True)
-                    df.to_csv(f"{comp}_csv/{comp}_{day}_{event}_{j}.csv", index=False)
-                    print(f"      saved {j}")
-                    # print(df)
+                # Save to CSV or print
+                # Create directory if it doesn't exist
+                os.makedirs(comp+"_csv", exist_ok=True)
+                df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False)
+                print(f"      saved {j}")
+                # print(df)
