@@ -26,10 +26,11 @@ import re  # For checking country codes
 
 path = "test_data/WorldCups2025"
 competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-competitions = ["COTTBUS","BAKU","ANTALYA","DOHA"] 
+competitions = ["OSIJEK","BAKU"] 
+competitions = ["COTTBUS"] 
 #osijek and cairo have vault problems
-events = ["FX","PH","SR","VT","PB","HB"]
-# events = ["VT"]
+# events = ["FX","PH","SR","VT","PB","HB"]
+events = ["VT"]
 days = ["QF","EF"]
 # days = ["QF"]
 
@@ -70,6 +71,24 @@ wc_dict = {
     "ANTALYA": Antalya_dict,
 }
 
+#%% Helpful Functions
+
+# Function to check if a string is a three-letter country code (all caps)
+def is_country_code(entry):
+    return entry in VALID_COUNTRY_CODES
+
+# Function to check if a value is a valid numeric score (allows decimal commas)
+def is_score(value):
+    return bool(re.fullmatch(r"\d+,\d+|\d+\.\d+", value))
+
+
+def format_scores(unformatted_scores):
+    #unformatted_scores is a list
+    scores = [val.replace(",", ".") for val in unformatted_scores if is_score(val) or "-" in val or "+" in val or "(" in val]
+    return scores
+
+
+#%%
 
 #keywords to search for beginning of table
 keywords = ["RANK","NO.","#"]
@@ -110,13 +129,7 @@ for comp in competitions:
                         print("Table start not found.")
                         table_data = []
                     
-                    # Function to check if a string is a three-letter country code (all caps)
-                    def is_country_code(entry):
-                        return entry in VALID_COUNTRY_CODES
-                    
-                    # Function to check if a value is a valid numeric score (allows decimal commas)
-                    def is_score(value):
-                        return bool(re.fullmatch(r"\d+,\d+|\d+\.\d+", value))
+
                     
                     # Process table data, ignoring lines that start with "Print"
                     cleaned_data = []
@@ -145,47 +158,55 @@ for comp in competitions:
             
                             full_name = " ".join(name_parts).strip()
                             last_name, first_name = full_name.split(",", 1) if "," in full_name else (full_name, "")
-            
+                            
+                            #Trying to change the vault data
+                            #typically it has the world Vault 1 and Vault 2 
+                            #afterwards there could be up to 5 entries
+                            
                             # Move to Vault 1 details
                             i += 1
-                            vault1 = table_data[i].split()
+                            vault1 = format_scores(table_data[i].split()[2:]) #the [2:] makes sure we remove the first two entries "Vault" and "1"
+                            
+                            #right away let
                             D1, E1, Penalty1, Bonus1, Score1 = ["", "", "", "", ""]
                             
                             # Remove "Vault 1" if it's mistakenly captured
                             
-                            if len(vault1) >= 5:
-                                D1, E1, *rest, Score1 = vault1[-5:]
-                                if not is_score(D1):  # Ensure it's a valid score
-                                    D1 = ""
-                                if not is_score(E1):  # Ensure it's a valid score
-                                    E1 = ""
-                                Score1 = Score1.replace(",", ".")  # Convert decimal comma to period
-                                for val in rest:
-                                    if "-" in val or val.startswith("0,"):
-                                        Penalty1 = val.replace(",", ".")
-                                    elif "+" in val:
-                                        Bonus1 = val.replace(",", ".")
+
+                            D1, E1, *rest, Score1 = vault1
+                            print(f"D1: {D1}")
+                            if not is_score(D1):  # Ensure it's a valid score
+                                D1 = ""
+                            if not is_score(E1):  # Ensure it's a valid score
+                                E1 = ""
+                            Score1 = Score1.replace(",", ".")  # Convert decimal comma to period
+                            for val in rest:
+                                if "-" in val or val.startswith("0,"):
+                                    Penalty1 = val.replace(",", ".")
+                                elif "+" in val:
+                                    Bonus1 = val.replace(",", ".")
                             
                             # Move to Vault 2 details
                             i += 1
-                            vault2 = table_data[i].split()
+                            vault2 = format_scores(table_data[i].split()[2:])
+                            vault2 = table_data[i].split()[2:]
                             D2, E2, Penalty2, Bonus2, Score2 = ["", "", "", "", ""]
                             
                             # Remove "Vault 2" if it's mistakenly captured
-                            vault2 = [v for v in vault2 if "Vault" not in v]
+                            # vault2 = [v for v in vault2 if "Vault" not in v]
                             
-                            if len(vault2) >= 5:
-                                D2, E2, *rest, Score2 = vault2[-5:]
-                                if not is_score(D2):  # Ensure it's a valid score
-                                    D2 = ""
-                                if not is_score(E2):  # Ensure it's a valid score
-                                    E2 = ""
-                                Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
-                                for val in rest:
-                                    if "-" in val or val.startswith("0,"):
-                                        Penalty2 = val.replace(",", ".")
-                                    elif "+" in val:
-                                        Bonus2 = val.replace(",", ".")
+                            
+                            D2, E2, *rest, Score2 = vault2
+                            if not is_score(D2):  # Ensure it's a valid score
+                                D2 = ""
+                            if not is_score(E2):  # Ensure it's a valid score
+                                E2 = ""
+                            Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
+                            for val in rest:
+                                if "-" in val or val.startswith("0,"):
+                                    Penalty2 = val.replace(",", ".")
+                                elif "+" in val:
+                                    Bonus2 = val.replace(",", ".")
             
                             # Store cleaned data
                             cleaned_data.append([rank, bib_number, last_name.strip(), first_name.strip(), country,
@@ -199,7 +220,7 @@ for comp in competitions:
                                                                  "D1", "E1", "Penalty1", "Bonus1", "Score1",
                                                                  "D2", "E2", "Penalty2", "Bonus2", "Score2",
                                                                  "Total Score"])
-                    else:
+                    else: #any event except vault
                         for row in table_data:
                             if row.strip().startswith("Print"):  # Ignore "Print" lines
                                 continue
@@ -247,7 +268,9 @@ for comp in competitions:
                             country = split_row[country_idx]
                         
                             # Convert numeric values (after the country column) from comma to point format
-                            scores = [val.replace(",", ".") for val in split_row[country_idx + 1:] if is_score(val) or "-" in val or "+" in val or "(" in val]
+                            unformatted_scores = split_row[country_idx + 1:]
+                            scores = format_scores(unformatted_scores)
+                            # scores = [val.replace(",", ".") for val in unformatted_scores if is_score(val) or "-" in val or "+" in val or "(" in val]
                         
                             # Default structure
                             D_score, E_score, penalty, bonus, final_score = "", "", "", "", ""
