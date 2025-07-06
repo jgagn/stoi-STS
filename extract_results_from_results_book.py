@@ -271,9 +271,9 @@ for comp in competitions:
                     
                     # Convert VT data into DataFrame
                     df = pd.DataFrame(cleaned_data, columns=["Rank", "BIB", "Last Name", "First Name", "Country",
-                                                             "D1", "E1", "Penalty1", "Bonus1", "Score1",
-                                                             "D2", "E2", "Penalty2", "Bonus2", "Score2",
-                                                             "Total Score"])
+                                                             "VT1_D", "VT1_E", "VT1_ND", "VT1_Bonus", "VT1_Score",
+                                                             "VT2_D", "VT2_E", "VT2_ND", "VT2_Bonus", "VT2_Score",
+                                                             "VT_Score"])
                 else: #any event except vault
                     for row in table_data:
                         if row.strip().startswith("Print"):  # Ignore "Print" lines
