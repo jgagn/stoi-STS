@@ -296,14 +296,14 @@ for athlete in athletes:
                             if np.all(np.isnan(vals)):
                                 #if they are all nans, set to zero... #TODO test if id rather them be nans?
                                 #it messes up my D vs. E score plot unfortunately right now
-                                athlete_database[athlete][series]['average'][tla+"_"+value] = 0.0
-                                athlete_database[athlete][series]['best'][tla+"_"+value] = 0.0
-                                athlete_database[athlete][series]['combined'][tla+"_"+value] = 0.0
+                                athlete_database[athlete][series]['average'][tla][value] = np.nan #0.0
+                                athlete_database[athlete][series]['best'][tla][value] = np.nan #0.0
+                                athlete_database[athlete][series]['combined'][tla][value] = np.nan #0.0
                                 
                             else:
-                                athlete_database[athlete][series]['average'][tla+"_"+value] = np.nanmean(vals)
-                                athlete_database[athlete][series]['best'][tla+"_"+value] = np.nanmax(vals)
-                                athlete_database[athlete][series]['combined'][tla+"_"+value] = np.nansum(vals)
+                                athlete_database[athlete][series]['average'][tla][value]= np.nanmean(vals)
+                                athlete_database[athlete][series]['best'][tla][value] = np.nanmax(vals)
+                                athlete_database[athlete][series]['combined'][tla][value] = np.nansum(vals)
         
                 else:
                     # print(f"{athlete} did not compete at {comp}")
