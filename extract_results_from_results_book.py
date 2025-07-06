@@ -26,15 +26,18 @@ import re  # For checking country codes
 
 path = "test_data/WorldCups2025"
 competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-competitions = ["OSIJEK","BAKU"] 
-competitions = ["COTTBUS"] 
+# competitions = ["OSIJEK","BAKU"] 
+# competitions = ["COTTBUS","ANTALYA"]
+competitions = ["COTTBUS","DOHA","OSIJEK","ANTALYA"]
 #osijek and cairo have vault problems
-# events = ["FX","PH","SR","VT","PB","HB"]
-events = ["VT"]
+#antalya data seems odd with final scores
+events = ["FX","PH","SR","VT","PB","HB"]
+# events = ["VT"]
 days = ["QF","EF"]
-days = ["QF"]
+# days = ["QF"]
 
-
+#osijek, no bib numbers
+#baku and cairo VT problems
 
 #create some dictionaries that contain page numbers on pdf for the events
 Cottbus_dict = {"QF":{"FX":[12],"PH":[15],"SR":[17],"VT":[19,20],"PB":[22],"HB":[24]},
@@ -167,18 +170,25 @@ for comp in competitions:
                         # Move to Vault 1 details
                         i += 1
                         
-                        #check that the first entry says Vault
+                        #check that the first entry is a score or says Vault
+                        try:
+                            score = float(table_data[i].split()[0])
+                            # if not(is_score(float(table_data[i].split()[0]))):
+                            #     print("score is a float but not a valid score")
+                        except:
+                            counter = 0
+                            while table_data[i].split()[0]!="Vault":
+                                counter+=1
+                                i+=1
+                                if counter > 10:
+                                    print("while loop for vault checker took over 10 times bro check line 177")
+                                    break
                         
-                        counter = 0
-                        while table_data[i].split()[0]!="Vault":
-                            counter+=1
-                            i+=1
-                            if counter > 10:
-                                print("while loop for vault checker took over 10 times bro check line 177")
-                                break
-                            
-                        vault1 = format_scores(table_data[i].split()[2:]) #the [2:] makes sure we remove the first two entries "Vault" and "1"
                         
+                        if table_data[i].split()[0]=="Vault 1":
+                            vault1 = format_scores(table_data[i].split()[2:]) #the [2:] makes sure we remove the first two entries "Vault" and "1"
+                        else:
+                            vault1 = format_scores(table_data[i].split())
                         #right away let
                         D1, E1, Penalty1, Bonus1, Score1 = ["", "", "", "", ""]
                         
@@ -203,35 +213,50 @@ for comp in competitions:
                         # Move to Vault 2 details
                         i += 1
                         
-                        counter = 0
-                        while table_data[i].split()[0]!="Vault":
-                            counter+=1
-                            i+=1
-                            if counter > 10:
-                                print("while loop for vault checker took over 10 times bro check line 209")
-                                break
-                        
-                        vault2 = format_scores(table_data[i].split()[2:])
-                        vault2 = table_data[i].split()[2:]
-                        D2, E2, Penalty2, Bonus2, Score2 = ["", "", "", "", ""]
-                        
-                        # Remove "Vault 2" if it's mistakenly captured
-                        # vault2 = [v for v in vault2 if "Vault" not in v]
-                        
-                        
-                        D2, E2, *rest, Score2 = vault2
-                        if not is_score(D2):  # Ensure it's a valid score
-                            D2 = ""
-                        if not is_score(E2):  # Ensure it's a valid score
-                            E2 = ""
-                        Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
-
-                        for value in rest:
-                            clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
-                            if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
-                                Penalty2 = format_scores([clean_value])[0]
-                            elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
-                                Bonus2 = format_scores([clean_value])[0]
+                        if i < len(table_data)-1:   
+                            try:
+                                score = float(table_data[i].split()[0])
+                                # if not(is_score(float(table_data[i].split()[0]))):
+                                #     print("score is a float but not a valid score")
+                            except:
+                                counter = 0
+                                while table_data[i].split()[0]!="Vault 2":
+                                    counter+=1
+                                    i+=1
+                                    if (counter > 10) or (i > len(table_data)-1):
+                                        print("while loop for vault checker took over 10 times bro check line 209")
+                                        break
+                                    
+                        if i < len(table_data):       
+                            if table_data[i].split()[0]=="Vault":
+                                vault2 = format_scores(table_data[i].split()[2:])
+                            else:
+                                vault2 = format_scores(table_data[i].split())
+                                
+                            D2, E2, Penalty2, Bonus2, Score2 = ["", "", "", "", ""]
+                            
+                            # Remove "Vault 2" if it's mistakenly captured
+                            # vault2 = [v for v in vault2 if "Vault" not in v]
+                            
+                            if "DNS" in table_data[i]:
+                                vault2 = ["", "", "", "", ""]
+                            
+                            try:
+                                D2, E2, *rest, Score2 = vault2
+                                if not is_score(D2):  # Ensure it's a valid score
+                                    D2 = ""
+                                if not is_score(E2):  # Ensure it's a valid score
+                                    E2 = ""
+                                Score2 = Score2.replace(",", ".")  # Convert decimal comma to period
+        
+                                for value in rest:
+                                    clean_value = re.sub(r"[()+]", "", value)  # Remove ( ) and +
+                                    if "-" in value or value.startswith("0."):  # Negative or 0.x = Penalty
+                                        Penalty2 = format_scores([clean_value])[0]
+                                    elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
+                                        Bonus2 = format_scores([clean_value])[0]
+                            except:
+                                print("vault 2 data error")
         
                         # Store cleaned data
                         cleaned_data.append([rank, bib_number, last_name.strip(), first_name.strip(), country,
@@ -329,5 +354,5 @@ for comp in competitions:
                 # Create directory if it doesn't exist
                 os.makedirs(comp+"_csv", exist_ok=True)
                 df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False)
-                print(f"      saved {j}")
+                # print(f"      saved")
                 # print(df)
