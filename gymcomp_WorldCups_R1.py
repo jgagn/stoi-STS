@@ -703,14 +703,19 @@ def generate_subplot(athlete):
     if athlete and athlete not in exclude_keys:
         # print(f"athlete: {athlete}")
         #get competitions
-        competitions = database[athlete].keys()
+        #Also Sketchy, hardcoding series and category
+        #TODO
+        # competitions = database[athlete]["WCups2025"].keys()
+        exclusions = ["category", "average", "best", "combined"]
+        competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
         comp_days_date = []
         # i = 0 #temporary date counter
         for comp in competitions:
-            results = [key for key in database[athlete][comp].keys() if key not in ["category", "average", "best","combined"]]
+            #also sketchy, hard coding in competition seroies
+            results = [key for key in database[athlete]['WCups2025'].keys() if key not in ["category", "average", "best","combined"]]
             for day in results:
                 date = database['competition_dates'][comp]
-                comp_days_date.append([comp,day,date])
+                comp_days_date.append([comp,comp,date])
                 
 
         #re-order based on date and comeptition date
@@ -719,8 +724,14 @@ def generate_subplot(athlete):
                                 'QF': 1, 'TF': 2, 'AA': 3, 'EF': 4, #if format is qualifying, team final, aa final, event final
                                 }
         
+        print(comp_days_date)
+        
         # Sort the list of lists by the date (primary key) and then by the secondary key
-        comp_days_date_sorted = sorted(comp_days_date, key=lambda x: (datetime.strptime(x[2], '%Y-%m-%d'),secondary_sort_order[x[1]]))
+        # comp_days_date_sorted = sorted(comp_days_date, key=lambda x: (datetime.strptime(x[2], '%Y-%m-%d'),secondary_sort_order[x[1]]))
+        
+    
+        #only gonna sort once now
+        comp_days_date_sorted = sorted(comp_days_date, key=lambda x: (datetime.strptime(x[2], '%Y-%m-%d'))) #,secondary_sort_order[x[1]]))
         
         # print(comp_days_date_sorted)
         
@@ -732,8 +743,8 @@ def generate_subplot(athlete):
             for comp,day,date in comp_days_date_sorted:
                 # print(f"comp: {comp}, day: {day}, date: {date}")
                 comp_labels.append(comp+" ("+day+")")
-                score = database[athlete][comp][day][tla]['Score']
-                categories.append(database[athlete][comp]['category'])
+                score = database[athlete]['WCups2025'][comp][tla]['Score']
+                categories.append(database[athlete]['WCups2025']['category'])
                 if score == 0:
                     score = np.nan #set to nan
                 tla_data.append(score)
@@ -913,10 +924,15 @@ tab2_layout = html.Div([
 def update_dropdowns(athlete, competition, database):
     ctx = callback_context
     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
+    
+    #super sketchy function that im hardcoding stuff in now
+    
     if triggered_id == 'athlete-dropdown2':
         if athlete:
-            competitions = list(database[athlete].keys())
+            
+            exclusions = ["category", "average", "best", "combined"]
+            competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
+            # competitions = list(database[athlete]["WCups2025"].keys())
             comp_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in competitions]
             
             return comp_options, None, [], None
@@ -925,7 +941,9 @@ def update_dropdowns(athlete, competition, database):
 
     elif triggered_id == 'competition-dropdown2':
         if athlete and competition:
-            results_options = [day for day in database[athlete][competition].keys() if day != "category"]
+            #Super sketchy here i am hardcoding competition and category
+            #TODO
+            results_options = [day for day in database[athlete]["WCups2025"][competition].keys() if day != "category"]
             return dash.no_update, dash.no_update, [{'label': result, 'value': result} for result in results_options], None
         else:
             return dash.no_update, dash.no_update, [], None
