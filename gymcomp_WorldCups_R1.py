@@ -322,11 +322,11 @@ def update_table(database, competition, categories, results, apparatus, selected
 
 #quickly sort competition options by date
 # Sort competitions by date (newest first)
-sorted_competitions = sorted(database['competition_dates'].keys(), key=lambda x: datetime.strptime(database['competition_dates'][x], '%Y-%m-%d'), reverse=True)
+sorted_competitions = sorted(database['series_dates'].keys(), key=lambda x: datetime.strptime(database['series_dates'][x], '%Y-%m-%d'), reverse=True)
 
 print(f"comp; {sorted_competitions}")
 # Create options for competition dropdown
-competition_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in sorted_competitions]
+competition_options = [{'label': database['series_acronyms'][comp], 'value': comp} for comp in sorted_competitions]
 
 
 # Define layout of the app
@@ -362,7 +362,7 @@ overview_layout = html.Div([
                     html.Div("Competition", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
                     dcc.Dropdown(
                         id='competition-dropdown',
-                        # options=[{'label': database['competition_acronyms'][comp], 'value': comp} for comp in database['overview'].keys()],
+                        # options=[{'label': database['series_acronyms'][comp], 'value': comp} for comp in database['overview'].keys()],
                         # value=list(next(iter(database.values())).keys())[0],
                         options=competition_options,
                         value=sorted_competitions[0],
@@ -589,7 +589,7 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
         
     fig = px.scatter(data, x='x', y='y', color='color', size='size', hover_name='name',
                      color_continuous_scale='Viridis', opacity=0.6, hover_data={'name': True,'category':True, 'x': False, 'y': False, 'size': False})
-    fig.update_layout(title=f"{database['competition_acronyms'][competition]}: D score vs. E score for {tla_dict[apparatus]}", 
+    fig.update_layout(title=f"{database['series_acronyms'][competition]}: D score vs. E score for {tla_dict[apparatus]}", 
                       xaxis_title="Execution (E score)", 
                       yaxis_title="Difficulty (D score)", 
                       autosize=True,

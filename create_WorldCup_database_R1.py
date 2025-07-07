@@ -181,7 +181,8 @@ athlete_database['overview'] = comp_overview
 
 #add acronym data here
 athlete_database['competition_acronyms'] = competition_acronyms
-athlete_database['series_acronyms'] = serires_acronyms
+athlete_database['series_acronyms'] = series_acronyms
+
 athlete_database['category_acronyms'] = category_acronyms
 #and date data
 athlete_database['competition_dates'] = competition_dates
