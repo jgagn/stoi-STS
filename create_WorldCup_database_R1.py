@@ -29,7 +29,7 @@ competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
 competition_series = ["WCups2025"]
 categories = ["SR"]
 days = ["QF","EF"]
-competition_acronyms = {
+series_acronyms = {
                     # "2025 World Cup Series": "2025 World Cup Series"
                     # "EF":"Event Finals",
                     # "QF":"Qualifications",
@@ -37,10 +37,42 @@ competition_acronyms = {
                     "WCups2025": "World Cup Series 2025"
                     }
 
+competition_acronyms = {
+                    "COTTBUS-QF":"Cottbus (QF)",
+                    "COTTBUS-EF":"Cottbus (EF)",
+                    "BAKU-QF":"Baku (QF)",
+                    "BAKU-EF":"Baku (EF)",
+                    "DOHA-QF":"Doha (QF)",
+                    "DOHA-EF":"Doha (EF)",
+                    "ANTALYA-QF":"Antalya (QF)",
+                    "ANTALYA-EF":"Antalya (EF)",
+                    "CAIRO-QF":"Cairo (QF)",
+                    "CAIRO-EF":"Cairo (EF)",
+                    "OSIJEK-QF":"Osijek (QF)",
+                    "OSIJEK-EF":"Osijek (EF)",
+                    }
+
+
 category_acronyms = {"SR":"Senior",
                      }
+
+series_dates = {
+                    "WCups2025": "2025-02-21"}
+
 competition_dates = {
-                    "WCups2025": "2025-02-21",
+                    # "WCups2025": "2025-02-21",
+                    "COTTBUS-QF":"2025-02-20",
+                    "COTTBUS-EF":"2025-02-23",
+                    "BAKU-QF":"2025-03-06",
+                    "BAKU-EF":"2025-03-08",
+                    "DOHA-QF":"2025-03-16",
+                    "DOHA-EF":"2025-03-18",
+                    "ANTALYA-QF":"2025-03-20",
+                    "ANTALYA-EF":"2025-03-22",
+                    "CAIRO-QF":"2025-03-25",
+                    "CAIRO-EF":"2025-03-26",
+                    "OSIJEK-QF":"2025-04-12",
+                    "OSIJEK-EF":"2025-04-13",
                     # "QF": "2025-02-21",
                     # "EF": "2025-02-23",
                     # "TF": "2024-07-02",
@@ -149,9 +181,11 @@ athlete_database['overview'] = comp_overview
 
 #add acronym data here
 athlete_database['competition_acronyms'] = competition_acronyms
+athlete_database['series_acronyms'] = serires_acronyms
 athlete_database['category_acronyms'] = category_acronyms
 #and date data
 athlete_database['competition_dates'] = competition_dates
+athlete_database['series_dates'] = series_dates
 
 for athlete in athletes:
     #create an dictionary entry for the athlete in the athlete_database

@@ -116,7 +116,7 @@ dropdown_style = {'width': '50%'}  # Adjust the width as needed
 dropdown_style1 = {'width': '100%'}  # Adjust the width as needed
 dropdown_style2 = {'width': '80%'}  # Adjust the width as needed
 tlas = ['FX', 'PH', 'SR', 'VT1','VT2', 'PB', 'HB'] #remove AA for World cups, 'AA']
-exclude_keys = ["overview", "competition_acronyms", "category_acronyms","competition_dates"]
+exclude_keys = ["overview", "competition_acronyms", "category_acronyms","series_acronyms","competition_dates","series_dates"]
 tla_dict = {
             "FX":"Floor Exercise",
             "PH":"Pommel Horse",
