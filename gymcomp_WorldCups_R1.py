@@ -895,6 +895,7 @@ tab2_layout = html.Div([
             id='competition-dropdown2',
             # options=[{'label': database['competition_acronyms'][comp], 'value': comp} for comp in database['overview'].keys()],
             value=list(next(iter(database.values())).keys())[0],
+            multi=True, #New
             style=dropdown_style2
         ),
         
@@ -1086,69 +1087,167 @@ def update_competition_dropdown(athlete):
      Input('competition-dropdown2', 'value')]
 )
 
-
-
 def update_score_graph(athlete, competition):
     traces = []
     max_score = 0
 
+    #lets check to see if we have everythin selected
     if athlete and competition:
-        d_scores = []
-        e_scores = []
-        plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
         
-        for app in plot_apparatus:
-            d = database[athlete][SERIES][competition][app]['D']
-            e = database[athlete][SERIES][competition][app]['E']
-            score = database[athlete][SERIES][competition][app]['Score']
+        #lets make sure it is a list if its not make it one
+        if not isinstance(competition, list):
+            competition = [competition]
+        
+        #width and offset will be based on number of days selected
+        # n_days = len(results)
+        # print(f"n_days: {n_days}")
+        
+        n_comps = len(competition)
+        width = barplot_width(n_comps)
+        offset_multiplier = -width * (n_comps - 1) / 2  # Start around center
+        
+        for i, comp in enumerate(competition):
+        
+            # athlete = database[athlete][competition]
+            d_scores = []
+            e_scores = []
+            plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
             
-            d_scores.append(d)
-            e_scores.append(e)
-            if score > max_score:
-                max_score = score
-
-        # width = barplot_width(1)  # You now always have one bar per apparatus
-        width = 0.4  # or hardcode as fixed
-
-        stacked_trace_d = go.Bar(
-            x=list(range(len(plot_apparatus))),
-            y=d_scores,
-            name='D score',
-            hovertext=[f'{d:.3f}' for d in d_scores],
-            hoverinfo='text+name',
-            marker_color=barplot_colours['D'][0],
-            width=width
-        )
-
-        stacked_trace_e = go.Bar(
-            x=list(range(len(plot_apparatus))),
-            y=e_scores,
-            name='E score',
-            hovertext=[f'{e:.3f}' for e in e_scores],
-            hoverinfo='text+name',
-            marker_color=barplot_colours['E'][0],
-            base=d_scores,
-            width=width,
-            text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
-            textposition='outside'
-        )
-
-        traces = [stacked_trace_d, stacked_trace_e]
-
+            for app in plot_apparatus:
+                d_scores.append(database[athlete][SERIES][comp][app]['D'])
+                e_scores.append(database[athlete][SERIES][comp][app]['E'])
+                # max_score = 16 #max(max_score, max(database[athlete][competition][result][app]['Score'])) #+athlete[day][app]['E'])) #, athlete[day][app]['E']))
+                score = database[athlete][SERIES][comp][app]['Score']
+                if score > max_score:
+                    max_score = score
+            # print(barplot_colours['D'][day])
+            
+            # Create stacked bar trace for D and E scores
+            stacked_trace_d = go.Bar(
+                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                y=d_scores,
+                name=f'D score ({comp})',
+                # hoverinfo='y+name',
+                hovertext=[f'{d:.3f}' for d in d_scores],
+                hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+                marker_color=barplot_colours['D'][i],  # Set color for D scores
+                # marker_pattern='cross',
+                # marker=dict(pattern='+', pattern_fgcolor='black'),
+                # marker_pattern_fgcolor=barplot_colours['E'][day],
+                offsetgroup=comp,  # Group by day
+                legendgroup=comp,  # Group by day
+                width = width,
+            )
+            
+            
+            stacked_trace_e = go.Bar(
+                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                y=e_scores,
+                name=f'E score ({comp})',
+                #custom hover text
+                # hoverinfo='y+name',
+                hovertext=[f'{e:.3f}' for e in e_scores],
+                hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+                marker_color=barplot_colours['E'][i],  # Set color for E scores
+                offsetgroup=comp,  # Group by day
+                legendgroup=comp,  # Group by day
+                base=d_scores,  # Offset by D scores
+                width = width,
+                # Adding text above the bar plot for the whole score, truncated to 3 decimal places
+                text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
+                textposition='outside'
+            )
+            
+            traces.append(stacked_trace_d)
+            traces.append(stacked_trace_e)
+            
+            
+            # Increment the offset multiplier for the next day
+            offset_multiplier += width # Adjust the multiplier as needed to prevent overlapping bars
+        
         layout = go.Layout(
-            title=f'Score Breakdown for {athlete} at {database["competition_acronyms"][competition]}',
-            xaxis={'title': 'Apparatus'},
-            yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
-            barmode='relative',
-            height=400,
-            xaxis_tickvals=list(range(len(plot_apparatus))),
-            xaxis_ticktext=plot_apparatus
+        title=f'Score Breakdown for {athlete} at {database["series_acronyms"][SERIES]}',
+        xaxis={'title': 'Apparatus'},
+        yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
+        barmode='relative',  # Relative bars for stacked and grouped
+        # width=1000,
+        height=400
         )
+    
+        # Set x-axis tick labels to be the apparatus names
+        layout['xaxis']['tickvals'] = list(range(len(plot_apparatus)))
+        layout['xaxis']['ticktext'] = plot_apparatus
+        # print(f"plot app: {plot_apparatus}")
     else:
+        #if we havent selected valid inputs yet, return blank
         traces = [go.Bar()]
         layout = go.Layout()
-
+        
     return {'data': traces, 'layout': layout}
+
+# def update_score_graph(athlete, competition):
+#     traces = []
+#     max_score = 0
+
+#     if athlete and competition:
+#         d_scores = []
+#         e_scores = []
+#         plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
+        
+#         for app in plot_apparatus:
+#             d = database[athlete][SERIES][competition][app]['D']
+#             e = database[athlete][SERIES][competition][app]['E']
+#             score = database[athlete][SERIES][competition][app]['Score']
+            
+#             d_scores.append(d)
+#             e_scores.append(e)
+#             if score > max_score:
+#                 max_score = score
+
+#         # width = barplot_width(1)  # You now always have one bar per apparatus
+#         width = 0.4  # or hardcode as fixed
+
+#         stacked_trace_d = go.Bar(
+#             x=list(range(len(plot_apparatus))),
+#             y=d_scores,
+#             name='D score',
+#             hovertext=[f'{d:.3f}' for d in d_scores],
+#             hoverinfo='text+name',
+#             marker_color=barplot_colours['D'][0],
+#             width=width
+#         )
+
+#         stacked_trace_e = go.Bar(
+#             x=list(range(len(plot_apparatus))),
+#             y=e_scores,
+#             name='E score',
+#             hovertext=[f'{e:.3f}' for e in e_scores],
+#             hoverinfo='text+name',
+#             marker_color=barplot_colours['E'][0],
+#             base=d_scores,
+#             width=width,
+#             text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
+#             textposition='outside'
+#         )
+
+#         traces = [stacked_trace_d, stacked_trace_e]
+
+#         layout = go.Layout(
+#             title=f'Score Breakdown for {athlete} at {database["competition_acronyms"][competition]}',
+#             xaxis={'title': 'Apparatus'},
+#             yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
+#             barmode='relative',
+#             height=400,
+#             xaxis_tickvals=list(range(len(plot_apparatus))),
+#             xaxis_ticktext=plot_apparatus
+#         )
+#     else:
+#         traces = [go.Bar()]
+#         layout = go.Layout()
+
+#     return {'data': traces, 'layout': layout}
 
 
 #SUBPLOT CALLBACKS
