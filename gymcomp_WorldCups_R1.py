@@ -18,6 +18,9 @@ Created on Tue Mar 26 13:38:51 2024
 # 2: Individual Athlete Analysis
 # 3: Team Scenarios
 
+#%% HARDCODED STUFF
+
+SERIES = "WCups2025"
 
 #%% Imports
 
@@ -895,16 +898,16 @@ tab2_layout = html.Div([
             style=dropdown_style2
         ),
         
-        html.Div("Results (can select more than 1):", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
-        dcc.Dropdown(
-            id='results-dropdown2',
-            # options=[{'label': day, 'value': day} for day in database[next(iter(database))].keys()],
-            value=['day1','day2'],  # Default value
-            multi=True,  # Allow multi-select
-            style=dropdown_style2
-        )
+        # html.Div("Results (can select more than 1):", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
+        # dcc.Dropdown(
+        #     id='results-dropdown2',
+        #     # options=[{'label': day, 'value': day} for day in database[next(iter(database))].keys()],
+        #     value=['day1','day2'],  # Default value
+        #     multi=True,  # Allow multi-select
+        #     style=dropdown_style2
+        # )
     ]),
-    dcc.Store(id='results-store2', data=database),  # Store the database - needed to dynamically change data in dropdown menus
+    # dcc.Store(id='results-store2', data=database),  # Store the database - needed to dynamically change data in dropdown menus
     dcc.Graph(id='score-graph'), #, style={'width': '1000px', 'height': '400px'}),
     
 ])
@@ -912,152 +915,239 @@ tab2_layout = html.Div([
 #SINGLE DROPDOWN CALLBACKS
 
 # Define a single callback to update both competition and results dropdowns
+# @app.callback(
+#     [Output('competition-dropdown2', 'options'),
+#      Output('competition-dropdown2', 'value'),
+#      Output('results-dropdown2', 'options'),
+#      Output('results-dropdown2', 'value')],
+#     [Input('athlete-dropdown2', 'value'),
+#      Input('competition-dropdown2', 'value')],
+#     [State('results-store2', 'data')]
+# )
+
+# def update_dropdowns(athlete, competition, database):
+#     ctx = callback_context
+#     triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+#     #super sketchy function that im hardcoding stuff in now
+    
+#     if triggered_id == 'athlete-dropdown2':
+#         if athlete:
+            
+#             exclusions = ["category", "average", "best", "combined"]
+#             competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
+#             # competitions = list(database[athlete]["WCups2025"].keys())
+#             comp_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in competitions]
+            
+#             return comp_options, None, [], None
+#         else:
+#             return [], None, [], None
+
+#     elif triggered_id == 'competition-dropdown2':
+#         if athlete and competition:
+#             #Super sketchy here i am hardcoding competition and category
+#             #TODO
+#             results_options = [day for day in database[athlete]["WCups2025"][competition].keys() if day != "category"]
+#             return dash.no_update, dash.no_update, [{'label': result, 'value': result} for result in results_options], None
+#         else:
+#             return dash.no_update, dash.no_update, [], None
+
+#     return [], None, [], None
+#PLOT 1 CALLBACKS
+
 @app.callback(
     [Output('competition-dropdown2', 'options'),
-     Output('competition-dropdown2', 'value'),
-     Output('results-dropdown2', 'options'),
-     Output('results-dropdown2', 'value')],
-    [Input('athlete-dropdown2', 'value'),
-     Input('competition-dropdown2', 'value')],
-    [State('results-store2', 'data')]
+     Output('competition-dropdown2', 'value')],
+    [Input('athlete-dropdown2', 'value')]
 )
-def update_dropdowns(athlete, competition, database):
-    ctx = callback_context
-    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    
-    #super sketchy function that im hardcoding stuff in now
-    
-    if triggered_id == 'athlete-dropdown2':
-        if athlete:
-            
-            exclusions = ["category", "average", "best", "combined"]
-            competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
-            # competitions = list(database[athlete]["WCups2025"].keys())
-            comp_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in competitions]
-            
-            return comp_options, None, [], None
-        else:
-            return [], None, [], None
+def update_competition_dropdown(athlete):
+    if athlete:
+        exclusions = ["category", "average", "best", "combined"]
+        competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
+        comp_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in competitions]
+        return comp_options, None
+    else:
+        return [], None
 
-    elif triggered_id == 'competition-dropdown2':
-        if athlete and competition:
-            #Super sketchy here i am hardcoding competition and category
-            #TODO
-            results_options = [day for day in database[athlete]["WCups2025"][competition].keys() if day != "category"]
-            return dash.no_update, dash.no_update, [{'label': result, 'value': result} for result in results_options], None
-        else:
-            return dash.no_update, dash.no_update, [], None
 
-    return [], None, [], None
-#PLOT 1 CALLBACKS
+# @app.callback(
+#     Output('score-graph', 'figure'),
+#     [Input('athlete-dropdown2', 'value'),
+#      Input('competition-dropdown2', 'value'),
+#      Input('results-dropdown2', 'value'),
+#      ]
+# )
+# def update_score_graph(athlete, competition, results):
+#     traces = []
+#     max_score = 0
+
+#     #lets check to see if we have everythin selected
+#     if athlete and competition and results:
+        
+#         #lets make sure it is a list if its not make it one
+#         if not isinstance(results, list):
+#             results = [results]
+        
+#         #width and offset will be based on number of days selected
+#         n_days = len(results)
+#         # print(f"n_days: {n_days}")
+        
+#         # print(f"width: {barplot_width(n_days)}")
+#         width = barplot_width(n_days)
+        
+#         # Define an offset multiplier for each day
+#         #starting with negative offset so we are always around zero
+#         offset_multiplier = -width*(n_days-1)/2
+        
+#         for i,result in enumerate(results):
+#             # athlete = database[athlete][competition]
+#             d_scores = []
+#             e_scores = []
+#             plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
+            
+#             for app in plot_apparatus:
+#                 d_scores.append(database[athlete][competition][result][app]['D'])
+#                 e_scores.append(database[athlete][competition][result][app]['E'])
+#                 # max_score = 16 #max(max_score, max(database[athlete][competition][result][app]['Score'])) #+athlete[day][app]['E'])) #, athlete[day][app]['E']))
+#                 score = database[athlete][competition][result][app]['Score']
+#                 if score > max_score:
+#                     max_score = score
+#             # print(barplot_colours['D'][day])
+            
+#             # Create stacked bar trace for D and E scores
+#             stacked_trace_d = go.Bar(
+#                 x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+#                 y=d_scores,
+#                 name=f'D score ({result})',
+#                 # hoverinfo='y+name',
+#                 hovertext=[f'{d:.3f}' for d in d_scores],
+#                 hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+#                 marker_color=barplot_colours['D'][i],  # Set color for D scores
+#                 # marker_pattern='cross',
+#                 # marker=dict(pattern='+', pattern_fgcolor='black'),
+#                 # marker_pattern_fgcolor=barplot_colours['E'][day],
+#                 offsetgroup=result,  # Group by day
+#                 legendgroup=result,  # Group by day
+#                 width = width,
+#             )
+            
+            
+#             stacked_trace_e = go.Bar(
+#                 x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+#                 y=e_scores,
+#                 name=f'E score ({result})',
+#                 #custom hover text
+#                 # hoverinfo='y+name',
+#                 hovertext=[f'{e:.3f}' for e in e_scores],
+#                 hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+#                 marker_color=barplot_colours['E'][i],  # Set color for E scores
+#                 offsetgroup=result,  # Group by day
+#                 legendgroup=result,  # Group by day
+#                 base=d_scores,  # Offset by D scores
+#                 width = width,
+#                 # Adding text above the bar plot for the whole score, truncated to 3 decimal places
+#                 text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
+#                 textposition='outside'
+#             )
+            
+#             traces.append(stacked_trace_d)
+#             traces.append(stacked_trace_e)
+            
+            
+#             # Increment the offset multiplier for the next day
+#             offset_multiplier += width # Adjust the multiplier as needed to prevent overlapping bars
+        
+#         layout = go.Layout(
+#         title=f'Score Breakdown for {athlete} at {database["competition_acronyms"][competition]}',
+#         xaxis={'title': 'Apparatus'},
+#         yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
+#         barmode='relative',  # Relative bars for stacked and grouped
+#         # width=1000,
+#         height=400
+#         )
+    
+#         # Set x-axis tick labels to be the apparatus names
+#         layout['xaxis']['tickvals'] = list(range(len(plot_apparatus)))
+#         layout['xaxis']['ticktext'] = plot_apparatus
+#         # print(f"plot app: {plot_apparatus}")
+#     else:
+#         #if we havent selected valid inputs yet, return blank
+#         traces = [go.Bar()]
+#         layout = go.Layout()
+        
+#     return {'data': traces, 'layout': layout}
+
 
 @app.callback(
     Output('score-graph', 'figure'),
     [Input('athlete-dropdown2', 'value'),
-     Input('competition-dropdown2', 'value'),
-     Input('results-dropdown2', 'value'),
-     ]
+     Input('competition-dropdown2', 'value')]
 )
-def update_score_graph(athlete, competition, results):
+
+
+
+def update_score_graph(athlete, competition):
     traces = []
     max_score = 0
 
-    #lets check to see if we have everythin selected
-    if athlete and competition and results:
+    if athlete and competition:
+        d_scores = []
+        e_scores = []
+        plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
         
-        #lets make sure it is a list if its not make it one
-        if not isinstance(results, list):
-            results = [results]
-        
-        #width and offset will be based on number of days selected
-        n_days = len(results)
-        # print(f"n_days: {n_days}")
-        
-        # print(f"width: {barplot_width(n_days)}")
-        width = barplot_width(n_days)
-        
-        # Define an offset multiplier for each day
-        #starting with negative offset so we are always around zero
-        offset_multiplier = -width*(n_days-1)/2
-        
-        for i,result in enumerate(results):
-            # athlete = database[athlete][competition]
-            d_scores = []
-            e_scores = []
-            plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
+        for app in plot_apparatus:
+            d = database[athlete][SERIES][competition][app]['D']
+            e = database[athlete][SERIES][competition][app]['E']
+            score = database[athlete][SERIES][competition][app]['Score']
             
-            for app in plot_apparatus:
-                d_scores.append(database[athlete][competition][result][app]['D'])
-                e_scores.append(database[athlete][competition][result][app]['E'])
-                # max_score = 16 #max(max_score, max(database[athlete][competition][result][app]['Score'])) #+athlete[day][app]['E'])) #, athlete[day][app]['E']))
-                score = database[athlete][competition][result][app]['Score']
-                if score > max_score:
-                    max_score = score
-            # print(barplot_colours['D'][day])
-            
-            # Create stacked bar trace for D and E scores
-            stacked_trace_d = go.Bar(
-                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
-                y=d_scores,
-                name=f'D score ({result})',
-                # hoverinfo='y+name',
-                hovertext=[f'{d:.3f}' for d in d_scores],
-                hoverinfo='text+name',  # Use custom hover text and show trace name
-                
-                marker_color=barplot_colours['D'][i],  # Set color for D scores
-                # marker_pattern='cross',
-                # marker=dict(pattern='+', pattern_fgcolor='black'),
-                # marker_pattern_fgcolor=barplot_colours['E'][day],
-                offsetgroup=result,  # Group by day
-                legendgroup=result,  # Group by day
-                width = width,
-            )
-            
-            
-            stacked_trace_e = go.Bar(
-                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
-                y=e_scores,
-                name=f'E score ({result})',
-                #custom hover text
-                # hoverinfo='y+name',
-                hovertext=[f'{e:.3f}' for e in e_scores],
-                hoverinfo='text+name',  # Use custom hover text and show trace name
-                
-                marker_color=barplot_colours['E'][i],  # Set color for E scores
-                offsetgroup=result,  # Group by day
-                legendgroup=result,  # Group by day
-                base=d_scores,  # Offset by D scores
-                width = width,
-                # Adding text above the bar plot for the whole score, truncated to 3 decimal places
-                text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
-                textposition='outside'
-            )
-            
-            traces.append(stacked_trace_d)
-            traces.append(stacked_trace_e)
-            
-            
-            # Increment the offset multiplier for the next day
-            offset_multiplier += width # Adjust the multiplier as needed to prevent overlapping bars
-        
-        layout = go.Layout(
-        title=f'Score Breakdown for {athlete} at {database["competition_acronyms"][competition]}',
-        xaxis={'title': 'Apparatus'},
-        yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
-        barmode='relative',  # Relative bars for stacked and grouped
-        # width=1000,
-        height=400
+            d_scores.append(d)
+            e_scores.append(e)
+            if score > max_score:
+                max_score = score
+
+        # width = barplot_width(1)  # You now always have one bar per apparatus
+        width = 0.4  # or hardcode as fixed
+
+        stacked_trace_d = go.Bar(
+            x=list(range(len(plot_apparatus))),
+            y=d_scores,
+            name='D score',
+            hovertext=[f'{d:.3f}' for d in d_scores],
+            hoverinfo='text+name',
+            marker_color=barplot_colours['D'][0],
+            width=width
         )
-    
-        # Set x-axis tick labels to be the apparatus names
-        layout['xaxis']['tickvals'] = list(range(len(plot_apparatus)))
-        layout['xaxis']['ticktext'] = plot_apparatus
-        # print(f"plot app: {plot_apparatus}")
+
+        stacked_trace_e = go.Bar(
+            x=list(range(len(plot_apparatus))),
+            y=e_scores,
+            name='E score',
+            hovertext=[f'{e:.3f}' for e in e_scores],
+            hoverinfo='text+name',
+            marker_color=barplot_colours['E'][0],
+            base=d_scores,
+            width=width,
+            text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
+            textposition='outside'
+        )
+
+        traces = [stacked_trace_d, stacked_trace_e]
+
+        layout = go.Layout(
+            title=f'Score Breakdown for {athlete} at {database["competition_acronyms"][competition]}',
+            xaxis={'title': 'Apparatus'},
+            yaxis={'title': 'Score', 'range': [0, max_score * 1.1]},
+            barmode='relative',
+            height=400,
+            xaxis_tickvals=list(range(len(plot_apparatus))),
+            xaxis_ticktext=plot_apparatus
+        )
     else:
-        #if we havent selected valid inputs yet, return blank
         traces = [go.Bar()]
         layout = go.Layout()
-        
+
     return {'data': traces, 'layout': layout}
 
 
