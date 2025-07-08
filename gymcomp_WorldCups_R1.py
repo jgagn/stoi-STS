@@ -1124,7 +1124,9 @@ def update_score_graph(athlete, competition):
             
             # Create stacked bar trace for D and E scores
             stacked_trace_d = go.Bar(
-                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
+
                 y=d_scores,
                 name=f'D score ({comp})',
                 # hoverinfo='y+name',
@@ -1135,14 +1137,15 @@ def update_score_graph(athlete, competition):
                 # marker_pattern='cross',
                 # marker=dict(pattern='+', pattern_fgcolor='black'),
                 # marker_pattern_fgcolor=barplot_colours['E'][day],
-                offsetgroup=comp,  # Group by day
+                # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
                 width = width,
             )
             
             
             stacked_trace_e = go.Bar(
-                x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
                 y=e_scores,
                 name=f'E score ({comp})',
                 #custom hover text
@@ -1151,7 +1154,7 @@ def update_score_graph(athlete, competition):
                 hoverinfo='text+name',  # Use custom hover text and show trace name
                 
                 marker_color=barplot_colours['E'][i],  # Set color for E scores
-                offsetgroup=comp,  # Group by day
+                # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
                 base=d_scores,  # Offset by D scores
                 width = width,
