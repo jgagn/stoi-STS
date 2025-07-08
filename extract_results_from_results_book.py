@@ -26,7 +26,7 @@ import re  # For checking country codes
 
 path = "test_data/WorldCups2025"
 competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-# competitions = ["OSIJEK","BAKU"] 
+# competitions = ["OSIJEK"]  #,"BAKU"] 
 # competitions = ["COTTBUS","ANTALYA"]
 # competitions = ["COTTBUS","DOHA","OSIJEK","ANTALYA"]
 #osijek and cairo have vault problems
@@ -285,7 +285,7 @@ for comp in competitions:
                             continue  # Skip empty rows
                     
                         # Remove first column if it contains only numbers (rank)
-                        if split_row[0].isdigit():
+                        if split_row[0].isdigit() and comp != "OSIJEK": #osijek data had rank but not bib, and messes up naming logic
                             split_row.pop(0)
                     
                         # Identify the country code index
@@ -312,12 +312,29 @@ for comp in competitions:
                         else:
                             # If there's no comma, assume the full name is missing a clear split
                             name_parts = full_name.split()
-                            if len(name_parts) > 1:
-                                last_name = " ".join(name_parts[:-1])  # Everything except the last word
-                                first_name = name_parts[-1]  # The last word is the first name
+                            
+                            # If there's at least one all-uppercase word, assume those are the last name
+                            upper_parts = [p for p in name_parts if p.isupper()]
+                            lower_parts = [p for p in name_parts if not p.isupper()]
+                         
+                            if upper_parts:
+                                last_name = " ".join(upper_parts)
+                                first_name = " ".join([p for p in name_parts if p not in upper_parts])
+                            elif len(name_parts) > 1:
+                                # Fallback: Assume last word is first name
+                                last_name = " ".join(name_parts[:-1])
+                                first_name = name_parts[-1]
                             else:
+                                # Single word, assume it's the last name
                                 last_name = full_name
                                 first_name = ""
+                            
+                            #make last name upper regardless
+                            last_name = last_name.upper()
+                            #in this case, its lower case and its in reverse
+                        
+                        print(f"first: {first_name}")
+                        print(f"last: {last_name}")
                         # Country code
                         country = split_row[country_idx]
                     
