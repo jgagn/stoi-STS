@@ -17,9 +17,17 @@ Created on Mon Feb 24 17:49:30 2025
 #Doha doesnt work well for some DNS results - need to decide how to treat that
 #%%
 
+
+
 #these two for opening up csvs and editing 
 import subprocess
 import platform
+
+#needed to open a pdf in a browser
+import webbrowser
+
+#for a random sleep 
+import time
 
 
 import os
@@ -425,6 +433,27 @@ for comp in competitions:
                         print(f"Flagged for review 🚩 — saved to: {flagged_path}")
                         if edit_csvs:
                             open_file(flagged_path)
+                            cwd = os.getcwd()
+                            page_display = page_number + 1 #python is index at 0
+                            url = f"file:///{cwd}/{file_path}#page={page_display}"
+                            
+                            
+                            #Can open in chrome but not respecting page display
+                            # chrome_path = "open -a 'Google Chrome'"
+                            # webbrowser.get(chrome_path).open(url)
+                            
+                            # subprocess.run(["open", "-a", "Google Chrome", url])
+                            # # Wait a moment
+                            # time.sleep(2)
+                            
+                            # # Re-open to force page anchor to apply
+                            # subprocess.run(["open", "-a", "Google Chrome", url])
+                            
+                            # Try safari
+                            subprocess.run(["open", "-a", "Safari", url])
+                            
+                            
+                            # webbrowser.open_new(f"file:///{cwd}/{file_path}#page={page_number}")
                 
                 else:
                     # Create directory if it doesn't exist
