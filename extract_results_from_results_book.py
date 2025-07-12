@@ -372,9 +372,53 @@ for comp in competitions:
                     
                     
                 # Save to CSV or print
-                # Create directory if it doesn't exist
-                os.makedirs(comp+"_csv", exist_ok=True)
-                #forcing encoding to be utf-8 to work with more alphabets
-                df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False,encoding='utf-8')
-                # print(f"      saved")
-                # print(df)
+                check_csvs = True
+                
+                #options to view all display rows and columns for data frame
+                pd.set_option('display.max_columns', None)
+                pd.set_option('display.max_rows', None)
+
+                # Show more characters per line (default is 80 or 100)
+                pd.set_option('display.width', 200)  # Try 200 or 300 depending on your screen
+                
+                # Also increase column width if needed
+                pd.set_option('display.max_colwidth', None)
+                
+                # Ensure all columns are visible (just in case)
+                pd.set_option('display.max_columns', None)
+
+
+                #if i want to return to default
+                # pd.reset_option('display.max_columns')
+                # pd.reset_option('display.max_rows')
+
+                
+                if check_csvs:
+                    #we want to view the dataframe to see if there are any errors
+                    print(f"\n----- Preview: {comp}_{day}_{event} -----")
+                    print(df)  # Show first 10 rows
+                    # print(df.columns)   # Show column headers
+                    
+                    # Ask user to confirm if it should be saved
+                    response = input("Save this file? (y for yes, anything else to flag): ").strip().lower()
+                    
+                    if response == 'y':
+                        os.makedirs(f"{comp}_csv", exist_ok=True)
+                        df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False, encoding='utf-8')
+                        print("Saved ✅")
+                    else:
+                        flagged_path = f"{comp}_csv/flagged/{comp}_{day}_{event}.csv"
+                        os.makedirs(f"{comp}_csv/flagged/", exist_ok=True)
+                        df.to_csv(flagged_path, index=False, encoding='utf-8')
+                        print(f"Flagged for review 🚩 — saved to: {flagged_path}")
+
+                
+                else:
+                    # Create directory if it doesn't exist
+                    os.makedirs(comp+"_csv", exist_ok=True)
+                    #forcing encoding to be utf-8 to work with more alphabets
+                    df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False,encoding='utf-8')
+                    # print(f"      saved")
+                    # print(df)
+                
+                #
