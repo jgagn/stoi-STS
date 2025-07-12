@@ -147,7 +147,9 @@ for comp in competitions:
             # Extract the detected encoding
             encoding = result['encoding']
             print(f"Detected encoding: {encoding}")
-        
+            
+            #overriding to utf-8
+            encoding = "utf-8"
             # Read the CSV file with the detected encoding
             database = pd.read_csv(comp+"_csv/"+comp+"_"+day+"_"+tla+".csv", encoding=encoding)
             

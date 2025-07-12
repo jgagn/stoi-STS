@@ -333,8 +333,8 @@ for comp in competitions:
                             last_name = last_name.upper()
                             #in this case, its lower case and its in reverse
                         
-                        print(f"first: {first_name}")
-                        print(f"last: {last_name}")
+                        # print(f"first: {first_name}")
+                        # print(f"last: {last_name}")
                         # Country code
                         country = split_row[country_idx]
                     
@@ -374,6 +374,7 @@ for comp in competitions:
                 # Save to CSV or print
                 # Create directory if it doesn't exist
                 os.makedirs(comp+"_csv", exist_ok=True)
-                df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False)
+                #forcing encoding to be utf-8 to work with more alphabets
+                df.to_csv(f"{comp}_csv/{comp}_{day}_{event}.csv", index=False,encoding='utf-8')
                 # print(f"      saved")
                 # print(df)
