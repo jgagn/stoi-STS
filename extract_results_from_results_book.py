@@ -17,6 +17,10 @@ Created on Mon Feb 24 17:49:30 2025
 #Doha doesnt work well for some DNS results - need to decide how to treat that
 #%%
 
+# #now need these for attempt at creating a server to get it to open to right page
+import http.server
+import socketserver
+import threading
 
 
 #these two for opening up csvs and editing 
@@ -434,8 +438,35 @@ for comp in competitions:
                         if edit_csvs:
                             open_file(flagged_path)
                             cwd = os.getcwd()
-                            page_display = page_number + 1 #python is index at 0
+                            page_display = pages_to_extract[0] + 1 #python is index at 0
                             url = f"file:///{cwd}/{file_path}#page={page_display}"
+                            
+                            # === CONFIGURATION ===
+                            PORT = 8000
+                            
+                            # === Construct URL ===
+                            file_url = f"http://localhost:{PORT}/{file_path}#page={page_display}"
+                            
+                            # === Start HTTP server in a thread ===
+                            def start_server():
+                                handler = http.server.SimpleHTTPRequestHandler
+                                with socketserver.TCPServer(("", PORT), handler) as httpd:
+                                    print(f"Serving at http://localhost:{PORT}")
+                                    httpd.serve_forever()
+                            
+                            server_thread = threading.Thread(target=start_server, daemon=True)
+                            server_thread.start()
+                            
+                            # Give server time to start
+                            time.sleep(1)
+                            
+                            # === Open in Google Chrome ===
+                            chrome_path = "open -a 'Google Chrome'"  # Mac-specific
+                            os.system(f"{chrome_path} '{file_url}'")
+                            
+                            # === Wait for user to close server ===
+                            input("Press Enter to stop the server and exit...\n")
+                            
                             
                             
                             #Can open in chrome but not respecting page display
