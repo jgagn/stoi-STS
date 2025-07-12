@@ -17,6 +17,10 @@ Created on Mon Feb 24 17:49:30 2025
 #Doha doesnt work well for some DNS results - need to decide how to treat that
 #%%
 
+#these two for opening up csvs and editing 
+import subprocess
+import platform
+
 
 import os
 from country_codes import VALID_COUNTRY_CODES
@@ -90,7 +94,14 @@ def format_scores(unformatted_scores):
     scores = [val.replace(",", ".") for val in unformatted_scores if is_score(val) or "-" in val or "+" in val or "(" in val]
     return scores
 
-
+#function to try and edit csvs that are flagged
+def open_file(filepath):
+    if platform.system() == "Darwin":  # macOS
+        subprocess.call(('open', filepath))
+    elif platform.system() == "Windows":
+        os.startfile(filepath)
+    elif platform.system() == "Linux":
+        subprocess.call(('xdg-open', filepath))
 #%%
 
 #keywords to search for beginning of table
@@ -373,6 +384,7 @@ for comp in competitions:
                     
                 # Save to CSV or print
                 check_csvs = True
+                edit_csvs = True
                 
                 #options to view all display rows and columns for data frame
                 pd.set_option('display.max_columns', None)
@@ -411,7 +423,8 @@ for comp in competitions:
                         os.makedirs(f"{comp}_csv/flagged/", exist_ok=True)
                         df.to_csv(flagged_path, index=False, encoding='utf-8')
                         print(f"Flagged for review 🚩 — saved to: {flagged_path}")
-
+                        if edit_csvs:
+                            open_file(flagged_path)
                 
                 else:
                     # Create directory if it doesn't exist
