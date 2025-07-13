@@ -136,6 +136,10 @@ def score_checker(Score, Dscore,Escore,Penalty=0.0,Bonus=0.0):
     else:
         return False
 
+#%% For post processing csvs
+
+first_loop = True
+
 
 #%%
 
@@ -461,8 +465,9 @@ for comp in competitions:
                     
                     
                 # Save to CSV or print
-                check_csvs = True
-                edit_csvs = True
+                check_em_all = True #new option that will go through one by one
+                check_csvs = False
+                edit_csvs = False
                 
                 #options to view all display rows and columns for data frame
                 pd.set_option('display.max_columns', None)
@@ -481,9 +486,67 @@ for comp in competitions:
                 #if i want to return to default
                 # pd.reset_option('display.max_columns')
                 # pd.reset_option('display.max_rows')
-
                 
-                if check_csvs:
+                if check_em_all:
+                    #no need to preview, lets just go ahead and make the file and open it
+                    path = f"{comp}_csv/{comp}_{day}_{event}.csv"
+                    os.makedirs(f"{comp}_csv/f", exist_ok=True)
+                    df.to_csv(path, index=False, encoding='utf-8')
+                    print(f"opening {path}...")
+                    open_file(path)
+                    cwd = os.getcwd()
+                    page_display = pages_to_extract[0] + 1 #python is index at 0
+                    url = f"file:///{cwd}/{file_path}#page={page_display}"
+                    
+                    # === CONFIGURATION ===
+                    PORT = 8000
+                    
+                    # === Construct URL ===
+                    file_url = f"http://localhost:{PORT}/{file_path}#page={page_display}"
+                    
+                    
+                    # === Start HTTP server in a thread ===
+                    def start_server():
+                        handler = http.server.SimpleHTTPRequestHandler
+                        with socketserver.TCPServer(("", PORT), handler) as httpd:
+                            print(f"Serving at http://localhost:{PORT}")
+                            httpd.serve_forever()
+                            
+                    if first_loop:
+                        server_thread = threading.Thread(target=start_server, daemon=True)
+                        server_thread.start()
+                    
+                        # Give server time to start
+                        time.sleep(1)
+                        
+                        #change first_loop flag
+                        first_loop=False
+                    
+                    # === Open in Google Chrome ===
+                    chrome_path = "open -a 'Google Chrome'"  # Mac-specific
+                    os.system(f"{chrome_path} '{file_url}'")
+                    
+                    # === Wait for user to close server ===
+                    input("Press Enter to stop the server and exit...\n")
+                    
+                    
+                    
+                    #Can open in chrome but not respecting page display
+                    # chrome_path = "open -a 'Google Chrome'"
+                    # webbrowser.get(chrome_path).open(url)
+                    
+                    # subprocess.run(["open", "-a", "Google Chrome", url])
+                    # # Wait a moment
+                    # time.sleep(2)
+                    
+                    # # Re-open to force page anchor to apply
+                    # subprocess.run(["open", "-a", "Google Chrome", url])
+                    
+                    # Try safari
+                    # subprocess.run(["open", "-a", "Safari", url])
+                    
+                    
+                elif check_csvs:
                     #we want to view the dataframe to see if there are any errors
                     print(f"\n----- Preview: {comp}_{day}_{event} -----")
                     print(df)  # Show first 10 rows
@@ -514,12 +577,12 @@ for comp in competitions:
                             file_url = f"http://localhost:{PORT}/{file_path}#page={page_display}"
                             
                             # === Start HTTP server in a thread ===
-                            def start_server():
-                                handler = http.server.SimpleHTTPRequestHandler
-                                with socketserver.TCPServer(("", PORT), handler) as httpd:
-                                    print(f"Serving at http://localhost:{PORT}")
-                                    httpd.serve_forever()
-                            
+                            # def start_server():
+                            #     handler = http.server.SimpleHTTPRequestHandler
+                            #     with socketserver.TCPServer(("", PORT), handler) as httpd:
+                            #         print(f"Serving at http://localhost:{PORT}")
+                            #         httpd.serve_forever()
+                                    
                             server_thread = threading.Thread(target=start_server, daemon=True)
                             server_thread.start()
                             
@@ -533,6 +596,11 @@ for comp in competitions:
                             # === Wait for user to close server ===
                             input("Press Enter to stop the server and exit...\n")
                             
+                            # === Proper shutdown ===
+                            if httpd:
+                                httpd.shutdown()
+                                httpd.server_close()
+                                print("Server shut down.")
                             
                             
                             #Can open in chrome but not respecting page display
