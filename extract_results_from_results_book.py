@@ -114,6 +114,29 @@ def open_file(filepath):
         os.startfile(filepath)
     elif platform.system() == "Linux":
         subprocess.call(('xdg-open', filepath))
+        
+#%% Score Sanity Checker
+
+def score_checker(Score, Dscore,Escore,Penalty=0.0,Bonus=0.0):
+    #function that checks if score adds up
+    #Penatly and Bonus are optional inputs
+    #convert all to floats
+    if Penalty == "":
+        Penalty = 0.0
+    if Bonus == "":
+        Bonus = 0.0
+    
+    S = float(Score)
+    D = float(Dscore)
+    E = float(Escore)
+    P = float(Penalty)
+    B = float(Bonus)
+    if S == E + E +P + B:
+        return True
+    else:
+        return False
+
+
 #%%
 
 #keywords to search for beginning of table
@@ -284,7 +307,34 @@ for comp in competitions:
                                             Bonus2 = format_scores([clean_value])[0]
                                 except:
                                     print("vault 2 data error")
-            
+                            
+                            #Score sanity checks
+                            #format i want is penalty to be negative, bonus positive
+                            #sometimes things are so bad that we dont have strings that are scores, so put ina  try except 
+                            try:
+                                if score_checker(Score1, D1, E1, Penalty1, Bonus1) == False:
+                                    #first thing to check is if penalty is negaive
+                                    if Penalty1 != "":
+                                        if float(Penalty1) > 0.0:
+                                            Penalty1 = -float(Penalty1)
+                                        #now check again:
+                                    if score_checker(Score1, D1, E1, Penalty1, Bonus1):
+                                        print(f"tried making penalty negative, still aint adding up for VT1")
+                            except:
+                                print(f"Major Error: Score Checker failed got {last_name}, {first_name}!")
+                            try:
+                                if score_checker(Score2, D2, E2, Penalty2, Bonus2) == False:
+                                    #first thing to check is if penalty is negaive
+                                    if Penalty2 != "":
+                                        if float(Penalty2) > 0.0:
+                                            Penalty2= -float(Penalty2)
+                                        #now check again:
+                                    if score_checker(Score2, D2, E2, Penalty2, Bonus2):
+                                        print(f"tried making penalty negative, still aint adding up for VT1")
+                            except:
+                                print(f"Major Error: Score Checker failed got {last_name}, {first_name}!")
+
+                            
                             # Store cleaned data
                             cleaned_data.append([rank, bib_number, last_name.strip(), first_name.strip(), country,
                                                  D1, E1, Penalty1, Bonus1, Score1,
@@ -384,7 +434,23 @@ for comp in competitions:
                                 penalty = format_scores([clean_value])[0]
                             elif "+" in value or value.startswith("0."):  # Positive or 0.x = Bonus
                                 bonus = format_scores([clean_value])[0]
-                    
+                                
+                                
+                        #Score sanity checks
+                        #format i want is penalty to be negative, bonus positive
+                        #sometimes things are so bad that we dont have strings that are scores, so put ina  try except 
+                        try:
+                            if score_checker(final_score, D_score, E_score, penalty, bonus) == False:
+                                #first thing to check is if penalty is negaive
+                                if penalty != "":
+                                    if float(penalty) > 0.0:
+                                        penalty = -float(penalty)
+                                    #now check again:
+                                if score_checker(final_score, D_score, E_score, penalty, bonus):
+                                    print(f"tried making penalty negative, still aint adding up")
+                        except:
+                            print(f"Major Error: Score Checker failed got {last_name}, {first_name}!")
+                        
                         # Ensure exactly 9 columns per row
                         cleaned_row = [bib_number, last_name, first_name, country, D_score, E_score, penalty, bonus, final_score]
                         cleaned_data.append(cleaned_row[:9])  # Trim any extra values
