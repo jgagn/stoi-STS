@@ -187,6 +187,31 @@ def get_color(score, min_score, max_score):
         color_value = score / (max_score - min_score)
         return color_value
 
+def update_histogram(database, competition, categories, results, apparatus):
+    bubble_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
+    if not bubble_data:
+        return px.histogram()  # empty figure
+
+    # Extract valid scores
+    scores = [stats['Score'] for stats in bubble_data.values() if not np.isnan(stats['Score']) and stats['Score'] > 0]
+
+    fig = px.histogram(
+        x=scores,
+        nbins=20,
+        labels={'x': 'Score'},
+        title=f"Score Distribution ({apparatus})",
+        color_discrete_sequence=['#636efa']
+    )
+
+    fig.update_layout(
+        xaxis_title='Score',
+        yaxis_title='Frequency',
+        template='plotly_white',
+        bargap=0.1
+    )
+
+    return fig
+
 # Function to update the bubble plot
 def update_bubble_plot(database, competition, categories, results, apparatus):
     data = {'x': [], 'y': [], 'category': [], 'size': [], 'name': [], 'score': [], 'ND':[], 'Bonus':[],  'color': []}
@@ -465,7 +490,7 @@ overview_layout = html.Div([
         id='plot-toggle',
         options=[
             {'label': 'Bubble Plot', 'value': 'bubble'},
-            {'label': 'Histogram', 'value': 'hist'}
+            {'label': 'Histogram', 'value': 'histogram'}
         ],
         value='bubble',
         inline=True
@@ -611,9 +636,13 @@ def set_category_dropdown_value(competition, options):
      Input('apparatus-dropdown', 'value'),
      Input('category-dropdown', 'value'),
      Input('competition-dropdown', 'value'),
-     Input('bubble-plot', 'clickData')]  # Add clickData as input
+     Input('bubble-plot', 'clickData'),# Add clickData as input
+     Input('plot-toggle', 'value'),# Add toggle option
+     ]  
 )
-def update_plot_and_table(results, apparatus, categories, competition, clickData):
+
+
+def update_plot_and_table(results, apparatus, categories, competition, clickData, plot_type):
     # Update bubble plot
     # print(f"plot and table categories: {categories}")
     
@@ -621,83 +650,90 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
     if not isinstance(categories, list):
         categories = [categories]
     
-    data = update_bubble_plot(database, competition, categories, results, apparatus)
     
-    #Adding full category name in the data
-    #ordered dict seems to be needed to make sure when i convert from ar=cronym to name the order stays the same
-    mapped_data = OrderedDict()
-    
-    if data['x']:
-        for key, values in data.items():
-            if key == 'category':
-                mapped_data['category'] = []
-                for value in values:
-                    mapped_data['category'].append(database['category_acronyms'].get(value, value))
-            else:
-                mapped_data[key] = values
-    
-        # print(f"mapped_data: {mapped_data}")
-    
-        # Let's use this new mapped data!
-        data = mapped_data
-        # print(f"data: {data}")
-        
-    fig = px.scatter(data, x='x', y='y', color='color', size='size', hover_name='name',
-                     color_continuous_scale='Viridis', opacity=0.6, hover_data={'name': True,'category':True,'ND': True, 'Bonus': True, 'x': False, 'y': False, 'size': False})
-    fig.update_layout(title=f"{database['series_acronyms'][competition]}: D score vs. E score for {tla_dict[apparatus]}", 
-                      xaxis_title="Execution (E score)", 
-                      yaxis_title="Difficulty (D score)", 
-                      autosize=True,
-                      margin=dict(l=40, r=40, t=40, b=40),
-                      # width=1000, #play with this value until you like it
-                      height=600,
-                      # width='100%',  # Set width to 100% for responsiveness
-                      # aspectratio=dict(x=3, y=2)  # Set aspect ratio (3:2)
-                      
-                      )
-    fig.update_traces(text=data['score'], textposition='top center')  
+    if plot_type == 'bubble':
 
-    # Customize hover template
-    hover_template = (
-        "<b>%{hovertext}</b><br>" +
-        "Category: %{customdata[0]}<br>" +
-        "D score: %{y:.3f}<br>" +
-        "E score: %{x:.3f}<br>" +
-        "ND: %{customdata[1]:.1f}<br>" +
-        "Bonus: %{customdata[2]:.1f}<br>" +
-        "Score: %{text:.3f}"
-    )
-    # Ensure customdata is a list of [category, ND] pairs for each point
-    #convert nan values for ND and Bonus
-    data['ND'] = [0.0 if np.isnan(v) else v for v in data['ND']]
-    data['Bonus'] = [0.0 if np.isnan(v) else v for v in data['Bonus']]
-    
-    customdata = list(zip(data['category'], data['ND'], data['Bonus']))
-    fig.update_traces(hovertemplate=hover_template, customdata=customdata)
-    
-    # Update color bar legend
-    fig.update_coloraxes(colorbar_title="Score")
-    
-    # Map color values to score values for color bar tick labels
-    color_values = np.linspace(0, 1, 11)  
-    
-    #only try to get a max score if we have plottable data, otherwise set max_score to an arbitrary value
-    if not data['x']:
-        max_score = 16
-    else:
-        max_score = np.nanmax(data['score'])
-        # print(f"max score: {max_score}")
-        score_values = [value * max_score for value in color_values]  
-        # print(f"score values: {score_values}")
+        data = update_bubble_plot(database, competition, categories, results, apparatus)
         
-        # Update color bar tick labels
-        fig.update_coloraxes(colorbar_tickvals=color_values, colorbar_ticktext=[f"{score:.3f}" for score in score_values])
+        #Adding full category name in the data
+        #ordered dict seems to be needed to make sure when i convert from ar=cronym to name the order stays the same
+        mapped_data = OrderedDict()
+        
+        if data['x']:
+            for key, values in data.items():
+                if key == 'category':
+                    mapped_data['category'] = []
+                    for value in values:
+                        mapped_data['category'].append(database['category_acronyms'].get(value, value))
+                else:
+                    mapped_data[key] = values
+        
+            # print(f"mapped_data: {mapped_data}")
+        
+            # Let's use this new mapped data!
+            data = mapped_data
+            # print(f"data: {data}")
+            
+        fig = px.scatter(data, x='x', y='y', color='color', size='size', hover_name='name',
+                         color_continuous_scale='Viridis', opacity=0.6, hover_data={'name': True,'category':True,'ND': True, 'Bonus': True, 'x': False, 'y': False, 'size': False})
+        fig.update_layout(title=f"{database['series_acronyms'][competition]}: D score vs. E score for {tla_dict[apparatus]}", 
+                          xaxis_title="Execution (E score)", 
+                          yaxis_title="Difficulty (D score)", 
+                          autosize=True,
+                          margin=dict(l=40, r=40, t=40, b=40),
+                          # width=1000, #play with this value until you like it
+                          height=600,
+                          # width='100%',  # Set width to 100% for responsiveness
+                          # aspectratio=dict(x=3, y=2)  # Set aspect ratio (3:2)
+                          
+                          )
+        fig.update_traces(text=data['score'], textposition='top center')  
     
-    # If a point is clicked, highlight the corresponding row in the table
-    if clickData:
-        selected_athlete = clickData['points'][0]['hovertext']
-        table = update_table(database, competition, categories, results, apparatus, selected_athlete)
-    else:
+        # Customize hover template
+        hover_template = (
+            "<b>%{hovertext}</b><br>" +
+            "Category: %{customdata[0]}<br>" +
+            "D score: %{y:.3f}<br>" +
+            "E score: %{x:.3f}<br>" +
+            "ND: %{customdata[1]:.1f}<br>" +
+            "Bonus: %{customdata[2]:.1f}<br>" +
+            "Score: %{text:.3f}"
+        )
+        # Ensure customdata is a list of [category, ND] pairs for each point
+        #convert nan values for ND and Bonus
+        data['ND'] = [0.0 if np.isnan(v) else v for v in data['ND']]
+        data['Bonus'] = [0.0 if np.isnan(v) else v for v in data['Bonus']]
+        
+        customdata = list(zip(data['category'], data['ND'], data['Bonus']))
+        fig.update_traces(hovertemplate=hover_template, customdata=customdata)
+        
+        # Update color bar legend
+        fig.update_coloraxes(colorbar_title="Score")
+        
+        # Map color values to score values for color bar tick labels
+        color_values = np.linspace(0, 1, 11)  
+        
+        #only try to get a max score if we have plottable data, otherwise set max_score to an arbitrary value
+        if not data['x']:
+            max_score = 16
+        else:
+            max_score = np.nanmax(data['score'])
+            # print(f"max score: {max_score}")
+            score_values = [value * max_score for value in color_values]  
+            # print(f"score values: {score_values}")
+            
+            # Update color bar tick labels
+            fig.update_coloraxes(colorbar_tickvals=color_values, colorbar_ticktext=[f"{score:.3f}" for score in score_values])
+        
+        # If a point is clicked, highlight the corresponding row in the table
+        if clickData:
+            selected_athlete = clickData['points'][0]['hovertext']
+            table = update_table(database, competition, categories, results, apparatus, selected_athlete)
+        else:
+            table = update_table(database, competition, categories, results, apparatus)
+    
+    elif plot_type == 'histogram':
+        fig = update_histogram(database, competition, categories, results, apparatus)
         table = update_table(database, competition, categories, results, apparatus)
     
     return fig, table
