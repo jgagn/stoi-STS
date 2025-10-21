@@ -158,6 +158,8 @@ def get_category_data_for_competition_day(database, competition, categories, res
                                     #I also want to add the category of the athlete into the data
                                     #this is because we have multi-select categories now and it is now useful to know
                                     data[athlete]['category'] = database[athlete][competition]['category']
+                                    #need to add country code now too
+                                    data[athlete]['country'] = database[athlete][competition]['country']
                                     
                                 except:
                                     #There are some scenarios where an athlete only competes day 1 but not day 2 or vice versa
@@ -297,11 +299,14 @@ def update_table(database, competition, categories, results, apparatus, selected
         # create "Category" column with capital "C" and map the acronyms to the full text
         df['Category'] = df['category'].map(database['category_acronyms'])
         
+        # create "Country column"
+        df['Country'] = df['country']
+        
         # Add rank column
         df['Rank'] = df.index + 1
         
         # Reorder columns
-        df = df[['Rank', 'Athlete name', 'Category','D score', 'E score','ND' ,'Bonus','Score']]
+        df = df[['Rank', 'Athlete name', 'Country','Category','D score', 'E score','ND' ,'Bonus','Score']]
         
         # Remove rows where 'E score' is NaN or 0.0
         df_cleaned = df[~(df['E score'].isna() | (df['E score'] == 0.0))]

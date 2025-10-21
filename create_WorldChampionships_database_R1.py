@@ -217,8 +217,14 @@ for athlete in athletes:
                 filtered_df = database[(database['Athlete'] == athlete) & (database['Competition'] == comp)]
                 category = filtered_df.iloc[0]['Category']
                 
+                #new - get country code
+                country = filtered_df.iloc[0]['Country']
+                
                 #3. append the category they are in for this competition -> important as athletes may change categories
                 athlete_database[athlete][series]['category'] = category
+                
+                #new - add country code
+                athlete_database[athlete][series]['country'] = country
                 
                 #4. Get what days they would've competed at this comp based on their category
                 days = comp_overview[series][category][comp]
