@@ -246,8 +246,12 @@ for athlete in athletes:
                             for value in order:
     
                                 val = filtered_df[f'{tla}_{value}']
+                                
+                                #change to zero if its nan
+                                
                                 try:
                                     athlete_database[athlete][series][comp+"-"+day][tla][value] = float(val.iloc[0])
+                                    
                                 except:
                                     #I want to put a nan if its not floatable
                                     athlete_database[athlete][series][comp+"-"+day][tla][value] = 0.0

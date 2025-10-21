@@ -596,7 +596,7 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
         # print(f"data: {data}")
         
     fig = px.scatter(data, x='x', y='y', color='color', size='size', hover_name='name',
-                     color_continuous_scale='Viridis', opacity=0.6, hover_data={'name': True,'category':True, 'x': False, 'y': False, 'size': False})
+                     color_continuous_scale='Viridis', opacity=0.6, hover_data={'name': True,'category':True,'ND': True, 'Bonus': True, 'x': False, 'y': False, 'size': False})
     fig.update_layout(title=f"{database['series_acronyms'][competition]}: D score vs. E score for {tla_dict[apparatus]}", 
                       xaxis_title="Execution (E score)", 
                       yaxis_title="Difficulty (D score)", 
@@ -621,6 +621,10 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
         "Score: %{text:.3f}"
     )
     # Ensure customdata is a list of [category, ND] pairs for each point
+    #convert nan values for ND and Bonus
+    data['ND'] = [0.0 if np.isnan(v) else v for v in data['ND']]
+    data['Bonus'] = [0.0 if np.isnan(v) else v for v in data['Bonus']]
+    
     customdata = list(zip(data['category'], data['ND'], data['Bonus']))
     fig.update_traces(hovertemplate=hover_template, customdata=customdata)
     
