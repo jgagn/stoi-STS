@@ -49,18 +49,18 @@ import pdfplumber
 import pandas as pd
 import re  # For checking country codes
 
-folder_path = "test_data/WorldCups2025"
-competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
+folder_path = "test_data/WorldChampionships2025"
+competitions = ["JAKARTA_QF_Apparatus"]
 # competitions = ["DOHA"] #,"OSIJEK","BAKU","CAIRO","ANTALYA"]
 # competitions = ["OSIJEK"]  #,"BAKU"] 
 # competitions = ["COTTBUS","ANTALYA"]
 # competitions = ["COTTBUS","DOHA","OSIJEK","ANTALYA"]
 #osijek and cairo have vault problems
 #antalya data seems odd with final scores
-events = ["FX","PH","SR","VT","PB","HB"]
+events = ["FX","PH","SR","VT1","VT","PB","HB"]
 # events = ["VT"]
-days = ["QF","EF"]
-# days = ["QF"]
+# days = ["QF","EF"]
+days = ["QF"]
 
 #osijek, no bib numbers
 #baku and cairo VT problems
@@ -90,14 +90,13 @@ Cairo_dict = {"QF":{"FX":[33],"PH":[34],"SR":[35],"VT":[36],"PB":[37],"HB":[38]}
               "EF":{"FX":[47],"PH":[48],"SR":[49],"VT":[50],"PB":[51],"HB":[52]},
               }
 
+Jakarta_QF_dict = {"QF":{"FX":[0,1,2,3],"PH":[4,5,6,7],"SR":[8,9,10],"VT1":[11,12,13],"VT":[14,15,16,17],"PB":[18,19,20],"HB":[22,23,24]},
+              # "EF":{"FX":[47],"PH":[48],"SR":[49],"VT":[50],"PB":[51],"HB":[52]},
+              }
+
 #create nested dictionary
 wc_dict = {
-    "COTTBUS": Cottbus_dict,
-    "DOHA": Doha_dict,
-    "OSIJEK": Osijek_dict,
-    "BAKU": Baku_dict,
-    "CAIRO": Cairo_dict,
-    "ANTALYA": Antalya_dict,
+    "JAKARTA_QF_Apparatus": Jakarta_QF_dict,
 }
 
 #%% Helpful Functions

@@ -65,9 +65,9 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the absolute path to the file
 #file path and csv file name
-path = "production_data/WorldCups2025"
+path = "production_data/WorldChamps2025"
 # pkl_file = "CottbusEF_mag_athletes"
-pkl_file = "WorldCups2025_athletes_R2"
+pkl_file = "WorldChamps2025_athletes_R1"
 
 file_path = os.path.join(base_dir, path+"/"+pkl_file)
 

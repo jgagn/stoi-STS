@@ -21,35 +21,36 @@ import chardet #to detect character encoding - making sure accents and such are 
 
 #%% Setup files to import
 
-competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-
+# competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
+competitions = ["JAKARTA_QF_Apparatus"]
 # competitions = ["COTTBUS"]
 
 #%% Acronyms
-competition_series = ["WCups2025"]
+competition_series = ["WorldChamps2025"]
 categories = ["SR"]
-days = ["QF","EF"]
+# days = ["QF","EF"]
+days = ["QF"]
 series_acronyms = {
                     # "2025 World Cup Series": "2025 World Cup Series"
                     # "EF":"Event Finals",
                     # "QF":"Qualifications",
                     # "Cottbus": "Cottbus"
-                    "WCups2025": "World Cup Series 2025"
+                    "WorldChamps2025": "World Championships 2025"
                     }
 
 competition_acronyms = {
-                    "COTTBUS-QF":"Cottbus (QF)",
-                    "COTTBUS-EF":"Cottbus (EF)",
-                    "BAKU-QF":"Baku (QF)",
-                    "BAKU-EF":"Baku (EF)",
-                    "DOHA-QF":"Doha (QF)",
-                    "DOHA-EF":"Doha (EF)",
-                    "ANTALYA-QF":"Antalya (QF)",
-                    "ANTALYA-EF":"Antalya (EF)",
-                    "CAIRO-QF":"Cairo (QF)",
-                    "CAIRO-EF":"Cairo (EF)",
-                    "OSIJEK-QF":"Osijek (QF)",
-                    "OSIJEK-EF":"Osijek (EF)",
+                    "JAKARTA-QF":"Qualifcations",
+                    # "COTTBUS-EF":"Cottbus (EF)",
+                    # "BAKU-QF":"Baku (QF)",
+                    # "BAKU-EF":"Baku (EF)",
+                    # "DOHA-QF":"Doha (QF)",
+                    # "DOHA-EF":"Doha (EF)",
+                    # "ANTALYA-QF":"Antalya (QF)",
+                    # "ANTALYA-EF":"Antalya (EF)",
+                    # "CAIRO-QF":"Cairo (QF)",
+                    # "CAIRO-EF":"Cairo (EF)",
+                    # "OSIJEK-QF":"Osijek (QF)",
+                    # "OSIJEK-EF":"Osijek (EF)",
                     }
 
 
@@ -57,22 +58,22 @@ category_acronyms = {"SR":"Senior",
                      }
 
 series_dates = {
-                    "WCups2025": "2025-02-21"}
+                    "WorldChamps2025": "2025-10-20"}
 
 competition_dates = {
                     # "WCups2025": "2025-02-21",
-                    "COTTBUS-QF":"2025-02-20",
-                    "COTTBUS-EF":"2025-02-23",
-                    "BAKU-QF":"2025-03-06",
-                    "BAKU-EF":"2025-03-08",
-                    "DOHA-QF":"2025-03-16",
-                    "DOHA-EF":"2025-03-18",
-                    "ANTALYA-QF":"2025-03-20",
-                    "ANTALYA-EF":"2025-03-22",
-                    "CAIRO-QF":"2025-03-25",
-                    "CAIRO-EF":"2025-03-26",
-                    "OSIJEK-QF":"2025-04-12",
-                    "OSIJEK-EF":"2025-04-13",
+                    "JAKARTA-QF":"2025-10-20",
+                    # "COTTBUS-EF":"2025-02-23",
+                    # "BAKU-QF":"2025-03-06",
+                    # "BAKU-EF":"2025-03-08",
+                    # "DOHA-QF":"2025-03-16",
+                    # "DOHA-EF":"2025-03-18",
+                    # "ANTALYA-QF":"2025-03-20",
+                    # "ANTALYA-EF":"2025-03-22",
+                    # "CAIRO-QF":"2025-03-25",
+                    # "CAIRO-EF":"2025-03-26",
+                    # "OSIJEK-QF":"2025-04-12",
+                    # "OSIJEK-EF":"2025-04-13",
                     # "QF": "2025-02-21",
                     # "EF": "2025-02-23",
                     # "TF": "2024-07-02",
@@ -96,7 +97,8 @@ columns = ["D Score","E Score","Penalty","Bonus","Final Score"]
 #create a dictionary where the csv appartus names are keys to desired apparatus abbreviation values
 #two-letter acronyms we want to use No AA in WCs leaving in for now!
 tlas = ["FX","PH","SR","VT1","VT2","PB","HB"] #,"AA"]
-comp_tlas = ["FX","PH","SR","VT","PB","HB"]
+tlas = ["FX","PH","SR","VT1","PB","HB"] #,"AA"]
+comp_tlas = ["FX","PH","SR","VT1","PB","HB"]
 
 # abbrev_dict = {apparatus[0]:tlas[0],
 #                apparatus[1]:tlas[1],
@@ -361,9 +363,9 @@ for series in competition_series:
 
 # File path to save the pickled database
 # database_filename = "CottbusEF_mag_athletes"
-path = "production_data/WorldCups2025"
+path = "production_data/WorldChamps2025"
 os.makedirs(path, exist_ok=True)
-database_filename = "WorldCups2025_athletes_R2"
+database_filename = "WorldChamps2025_athletes_R1"
 file_path = path+"/"+database_filename
 
 # Pickle the database
