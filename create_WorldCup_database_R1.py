@@ -234,7 +234,11 @@ for athlete in athletes:
                             #query the dataframe to obtain all data
                             athlete_database[athlete][series][comp+"-"+day][tla] = {}
                             for value in order:
-    
+                                #the way I am creating the inital database now
+                                #means that each apparatus is in its own row
+                                #i need to filter by apparatus column also in this case
+                                filtered_df = database[(database['Athlete'] == athlete) & (database['Competition'] == comp) & (database['Results'] == day) & (database['apparatus'] == tla)]
+                                
                                 val = filtered_df[f'{tla}_{value}']
                                 try:
                                     athlete_database[athlete][series][comp+"-"+day][tla][value] = float(val.iloc[0])

@@ -22,7 +22,7 @@ import chardet #to detect character encoding - making sure accents and such are 
 #%% Setup files to import
 
 # competitions = ["COTTBUS","DOHA","OSIJEK","BAKU","CAIRO","ANTALYA"]
-competitions = ["JAKARTA_QF_Apparatus"]
+competitions = ["JAKARTA"]
 # competitions = ["COTTBUS"]
 
 #%% Acronyms
@@ -194,6 +194,7 @@ athlete_database['series_dates'] = series_dates
 
 for athlete in athletes:
     #create an dictionary entry for the athlete in the athlete_database
+    # print(f"{athlete}")
     athlete_database[athlete] = {}
     #Lets start by going through each competition
     for series in competition_series:
@@ -206,6 +207,7 @@ for athlete in athletes:
             
             # print(f"comp: {comp}")
             if not matching_entries.empty:
+                
                 
                 #1. create a dictionary entry for this competition serires
                 athlete_database[athlete][series] = {}
@@ -235,6 +237,12 @@ for athlete in athletes:
                         for tla in tlas:
                             #query the dataframe to obtain all data
                             athlete_database[athlete][series][comp+"-"+day][tla] = {}
+                            
+                            #the way I am creating the inital database now
+                            #means that each apparatus is in its own row
+                            #i need to filter by apparatus column also in this case
+                            filtered_df = database[(database['Athlete'] == athlete) & (database['Competition'] == comp) & (database['Results'] == day) & (database['apparatus'] == tla)]
+                            
                             for value in order:
     
                                 val = filtered_df[f'{tla}_{value}']
