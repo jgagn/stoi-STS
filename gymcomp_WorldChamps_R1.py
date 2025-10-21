@@ -727,8 +727,11 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
         
         # If a point is clicked, highlight the corresponding row in the table
         if clickData:
-            selected_athlete = clickData['points'][0]['hovertext']
-            table = update_table(database, competition, categories, results, apparatus, selected_athlete)
+            try:
+                selected_athlete = clickData['points'][0]['hovertext']
+                table = update_table(database, competition, categories, results, apparatus, selected_athlete)
+            except:
+                table = update_table(database, competition, categories, results, apparatus)
         else:
             table = update_table(database, competition, categories, results, apparatus)
     
