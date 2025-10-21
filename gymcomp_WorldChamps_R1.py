@@ -496,21 +496,18 @@ overview_layout = html.Div([
         inline=True
             ),
         
-    #     html.Div([
-    #     html.Div("Plot Type:", style={'marginRight': '10px', 'verticalAlign': 'middle', 'display': 'inline-block'}),
-    #     dbc.RadioItems(
-    #         id='plot-toggle',
-    #         options=[
-    #             {'label': 'Bubble Plot', 'value': 'bubble'},
-    #             {'label': 'Histogram', 'value': 'histogram'}
-    #         ],
-    #         value='bubble',
-    #         inline=True,  # makes the buttons side by side
-    #         inputStyle={"margin-right": "5px", "margin-left": "15px"},  # spacing between radio circles and labels
-    #         labelStyle={"margin-right": "20px"}  # spacing between labels
-    #     )
-    # ], style={'marginBottom': '10px', 'display': 'flex', 'align-items': 'center'}),
-        
+        dbc.RadioItems(
+        id='hist-xaxis-toggle',
+        options=[
+            {'label': 'D Score', 'value': 'D'},
+            {'label': 'E Score', 'value': 'E'},
+            {'label': 'ND', 'value': 'ND'},
+            {'label': 'Bonus', 'value': 'Bonus'},
+            {'label': 'Total Score', 'value': 'Score'}
+        ],
+        value='Score',
+        inline=True,
+            ),
         
         dbc.Row([
             dbc.Col(
