@@ -275,6 +275,11 @@ def update_table(database, competition, categories, results, apparatus, selected
         # Sort DataFrame by Score in descending order (if tie, sort by E score for now)
         df = df.sort_values(by=['Score', 'E'], ascending=[False, False])
         
+        # Keep only rows with a valid D  score (not NaN or zero)
+        # sometimes a legitimate score can be zero so best to check
+        # df = df[(df['D'].notna() & (df['D'] != 0)) | (df['E'].notna() & (df['E'] != 0))]
+        df = df[(df['D'].notna() & (df['D'] != 0))]
+        
         # print(f"df: {df}")
         # Reset index to include Athlete name as a column
         df = df.reset_index().rename(columns={'index': 'Athlete name'})
