@@ -444,6 +444,48 @@ overview_layout = html.Div([
             html.Li("Use the toolbar above the bubble plot to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
         ]),
         
+        # html.Div([
+        #     html.Div("Plot Type (Bubble or Histogram)", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
+        #     dcc.Dropdown(
+        #         id='plot-dropdown',
+        #         # value='SR21', #initializing with this value for now - should be dynamic
+        #         style=dropdown_style1,
+        #         multi=False # Enable multi-select
+        #     )
+        # ], style={'marginBottom': '10px'}),
+        
+        # dbc.Switch(
+        # id='plot-switch',
+        # label='Bubble Plot',
+        # value=True,  # True = Bubble, False = Histogram
+        # style={'margin-bottom': '10px'}
+        #     ),
+        
+        dbc.RadioItems(
+        id='plot-toggle',
+        options=[
+            {'label': 'Bubble Plot', 'value': 'bubble'},
+            {'label': 'Histogram', 'value': 'hist'}
+        ],
+        value='bubble',
+        inline=True
+            ),
+        
+    #     html.Div([
+    #     html.Div("Plot Type:", style={'marginRight': '10px', 'verticalAlign': 'middle', 'display': 'inline-block'}),
+    #     dbc.RadioItems(
+    #         id='plot-toggle',
+    #         options=[
+    #             {'label': 'Bubble Plot', 'value': 'bubble'},
+    #             {'label': 'Histogram', 'value': 'histogram'}
+    #         ],
+    #         value='bubble',
+    #         inline=True,  # makes the buttons side by side
+    #         inputStyle={"margin-right": "5px", "margin-left": "15px"},  # spacing between radio circles and labels
+    #         labelStyle={"margin-right": "20px"}  # spacing between labels
+    #     )
+    # ], style={'marginBottom': '10px', 'display': 'flex', 'align-items': 'center'}),
+        
         
         dbc.Row([
             dbc.Col(
