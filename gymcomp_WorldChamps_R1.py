@@ -199,10 +199,11 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
     values = []
     for stats in bubble_data.values():
         val = stats.get(xaxis_var)
-        if val is not None and not np.isnan(val):
+        if val is not None and not np.isnan(val) and stats.get("D")!=0: #if a score is zero, I dont want it on the list I get
             values.append(val)
 
 
+    
     fig = px.histogram(
         # x=scores,
         x=values,
@@ -210,7 +211,18 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
         # labels={'x': 'Score'},
         labels={'x': xaxis_var},
         title=f"{xaxis_var} Distribution ({apparatus})",
-        color_discrete_sequence=['#636efa']
+        color_discrete_sequence=['#636efa'],
+        # text_auto='.3f'
+    )
+
+    # Add outlines around each bar
+    fig.update_traces(
+        marker_line_color='white',   # or 'black' for sharper contrast
+        marker_line_width=1.0,
+        # hovertemplate=(
+        #     "<b>Bin range:</b> %{x.start:.3f} – %{x.end:.3f}<br>"
+        #     "<b>Count:</b> %{y}<extra></extra>"
+        # )
     )
 
     fig.update_layout(
@@ -218,9 +230,38 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
         xaxis_title=xaxis_var,
         yaxis_title='Frequency',
         template='plotly_white',
-        bargap=0.1
+        bargap=0.0 #0.1
     )
-
+    
+        
+    # Optional: specify bin size manually (e.g., every 0.5 points)
+    fig.update_traces(xbins=dict(start=np.floor(min(values)*10)/10-.1, end=np.ceil(max(values)*10)/10+.1, size=0.1))
+    
+    #do some statistical calcs
+    # Compute mean and std for the distribution
+    mean = np.mean(values)
+    std = np.std(values)
+    median = np.median(values)
+    min_val = np.min(values)
+    max_val = np.max(values)
+    
+    
+    stats_text = f"Min: {min_val:.3f}<br>Max: {max_val:.3f}<br>Mean: {mean:.3f}<br>Median: {median:.3f}<br>Std Dev: {std:.3f}"
+    
+    fig.add_annotation(
+        text=stats_text,
+        xref="paper", yref="paper",
+        x=1.05, y=0.95,
+        showarrow=False,
+        align="right",
+        bgcolor="rgba(255,255,255,0.8)",
+        bordercolor="gray",
+        borderwidth=1,
+        font=dict(size=12)
+    )
+    
+    
+    
     return fig
 
 # Function to update the bubble plot
