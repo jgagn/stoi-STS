@@ -430,16 +430,16 @@ Select the Competition Data you would like to visualize through the dropdown
 
 overview_layout = html.Div([
 
-    html.H3("How to Use The Competition Overview Tab"),
-    html.P("Follow these steps to interact with the data:"),
+    # html.H3("How to Use The Competition Overview Tab"),
+    # html.P("Follow these steps to interact with the data:"),
 
-    html.Ol([
-        html.Li("Use the Competition selector to choose a competition from the dropdown list."),
-        html.Li("Select one or more categories using the Category selector to filter the results accordingly."),
-        html.Li("Choose the type of results you want to see (ex. day 1, day 2, average, best) using the Results selector."),
-        html.Li("Use the Apparatus selector to further refine the data by apparatus."),
-        html.Li("View the interactive bubble plot and data table below for detailed insights.")
-    ]),
+    # html.Ol([
+    #     html.Li("Use the Competition selector to choose a competition from the dropdown list."),
+    #     html.Li("Select one or more categories using the Category selector to filter the results accordingly."),
+    #     html.Li("Choose the type of results you want to see (ex. day 1, day 2, average, best) using the Results selector."),
+    #     html.Li("Use the Apparatus selector to further refine the data by apparatus."),
+    #     html.Li("View the interactive bubble plot and data table below for detailed insights.")
+    # ]),
     
     # Customized horizontal line to separate sections
     html.Hr(style={'borderTop': '3px solid #bbb'}),
@@ -508,18 +508,18 @@ overview_layout = html.Div([
     html.Hr(style={'borderTop': '3px solid #bbb'}),
 
     dbc.Container([
-        html.H3('Interactive Bubble Plot'),
+        html.H3('Interactive Bubble and  Histogram Plots'),
         
-        html.P("Understanding the Interactive Bubble Plot and Data Table:"),
-        html.Ol([
-            html.Li("The bubble plot visualizes scores with bubbles representing athletes. The x-axis shows the E score, and the y-axis shows the D score."),
-            html.Li("The size of the bubble corresponds to the athlete's overall score, and the color intensity represents the score magnitude."),
-            html.Li("Hover over a bubble to see detailed information, including the athlete's name, category, and scores."),
-            html.Li("Clicking a bubble highlights the corresponding athlete's row in the data table."),
-            html.Li("The data table provides a ranked list of athletes based on the selected criteria, with columns for rank, athlete name, category, D score, E score, and total score."),
-            html.Li("Rows in the data table are highlighted when corresponding bubbles are clicked, making it easier to cross-reference data between the plot and table."),
-            html.Li("Use the toolbar above the bubble plot to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
-        ]),
+        # html.P("Understanding the Interactive Bubble Plot and Data Table:"),
+        # html.Ol([
+        #     html.Li("The bubble plot visualizes scores with bubbles representing athletes. The x-axis shows the E score, and the y-axis shows the D score."),
+        #     html.Li("The size of the bubble corresponds to the athlete's overall score, and the color intensity represents the score magnitude."),
+        #     html.Li("Hover over a bubble to see detailed information, including the athlete's name, category, and scores."),
+        #     html.Li("Clicking a bubble highlights the corresponding athlete's row in the data table."),
+        #     html.Li("The data table provides a ranked list of athletes based on the selected criteria, with columns for rank, athlete name, category, D score, E score, and total score."),
+        #     html.Li("Rows in the data table are highlighted when corresponding bubbles are clicked, making it easier to cross-reference data between the plot and table."),
+        #     html.Li("Use the toolbar above the bubble plot to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
+        # ]),
         
         # html.Div([
         #     html.Div("Plot Type (Bubble or Histogram)", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
@@ -548,18 +548,56 @@ overview_layout = html.Div([
         inline=True
             ),
         
-        dbc.RadioItems(
-        id='hist-xaxis-toggle',
-        options=[
-            {'label': 'D Score', 'value': 'D'},
-            {'label': 'E Score', 'value': 'E'},
-            {'label': 'ND', 'value': 'ND'},
-            {'label': 'Bonus', 'value': 'Bonus'},
-            {'label': 'Total Score', 'value': 'Score'}
+        # dbc.RadioItems(
+        # id='hist-xaxis-toggle',
+        # options=[
+        #     {'label': 'D Score', 'value': 'D'},
+        #     {'label': 'E Score', 'value': 'E'},
+        #     {'label': 'ND', 'value': 'ND'},
+        #     {'label': 'Bonus', 'value': 'Bonus'},
+        #     {'label': 'Total Score', 'value': 'Score'}
+        # ],
+        # value='Score',
+        # inline=True,
+        #     ),
+
+
+        html.Div([
+            dcc.Dropdown(
+                id='hist-xaxis-toggle',
+                options=[
+                    {'label': 'Total Score', 'value': 'Score'},
+                    {'label': 'D Score', 'value': 'D'},
+                    {'label': 'E Score', 'value': 'E'},
+                    {'label': 'Bonus', 'value': 'Bonus'},
+                    {'label': 'ND', 'value': 'ND'},
+                ],
+                value='Score',
+                style={'width': '75%'}  # keep the width here
+            )
         ],
-        value='Score',
-        inline=True,
-            ),
+        id='hist-options-row',  # <--- Add this
+        style={'display': 'none', 'marginBottom': '10px'}  # initially hidden
+        ),
+
+
+        # dbc.Row(
+        #     dbc.RadioItems(
+        #         id='hist-xaxis-toggle',
+        #         options=[
+        #             {'label': 'D Score', 'value': 'D'},
+        #             {'label': 'E Score', 'value': 'E'},
+        #             {'label': 'ND', 'value': 'ND'},
+        #             {'label': 'Bonus', 'value': 'Bonus'},
+        #             {'label': 'Total Score', 'value': 'Score'}
+        #         ],
+        #         value='Score',
+        #         inline=True,
+        #     ),
+        #     id='hist-options-row',  # container id
+        #     style={'display': 'none', 'marginBottom': '10px'}  # initially hidden
+        # ),
+
         
         dbc.Row([
             dbc.Col(
@@ -586,7 +624,19 @@ overview_layout = html.Div([
         
     
 ])
+    
+#callback for histogram dropdown to appear when toggle is selected
+@app.callback(
+    Output('hist-options-row', 'style'),
+    Input('plot-toggle', 'value')
+)
+def toggle_hist_options(plot_type):
+    if plot_type == 'histogram':
+        return {'display': 'flex', 'width': '75%'}
+    return {'display': 'none'}
 
+
+    
 # Define callback to update the options of the results dropdown based on the selected competition and category
 @app.callback(
     Output('results-dropdown', 'options'),
