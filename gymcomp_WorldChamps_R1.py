@@ -187,24 +187,35 @@ def get_color(score, min_score, max_score):
         color_value = score / (max_score - min_score)
         return color_value
 
-def update_histogram(database, competition, categories, results, apparatus):
+def update_histogram(database, competition, categories, results, apparatus, xaxis_var='Score'):
     bubble_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
     if not bubble_data:
         return px.histogram()  # empty figure
 
     # Extract valid scores
-    scores = [stats['Score'] for stats in bubble_data.values() if not np.isnan(stats['Score']) and stats['Score'] > 0]
+    # scores = [stats['Score'] for stats in bubble_data.values() if not np.isnan(stats['Score']) and stats['Score'] > 0]
+
+    # Extract valid values for the chosen x-axis
+    values = []
+    for stats in bubble_data.values():
+        val = stats.get(xaxis_var)
+        if val is not None and not np.isnan(val):
+            values.append(val)
+
 
     fig = px.histogram(
-        x=scores,
+        # x=scores,
+        x=values,
         nbins=20,
-        labels={'x': 'Score'},
-        title=f"Score Distribution ({apparatus})",
+        # labels={'x': 'Score'},
+        labels={'x': xaxis_var},
+        title=f"{xaxis_var} Distribution ({apparatus})",
         color_discrete_sequence=['#636efa']
     )
 
     fig.update_layout(
-        xaxis_title='Score',
+        # xaxis_title='Score',
+        xaxis_title=xaxis_var,
         yaxis_title='Frequency',
         template='plotly_white',
         bargap=0.1
@@ -635,11 +646,12 @@ def set_category_dropdown_value(competition, options):
      Input('competition-dropdown', 'value'),
      Input('bubble-plot', 'clickData'),# Add clickData as input
      Input('plot-toggle', 'value'),# Add toggle option
+     Input('hist-xaxis-toggle', 'value'),# Add toggle option
      ]  
 )
 
 
-def update_plot_and_table(results, apparatus, categories, competition, clickData, plot_type):
+def update_plot_and_table(results, apparatus, categories, competition, clickData, plot_type,xaxis_var):
     # Update bubble plot
     # print(f"plot and table categories: {categories}")
     
@@ -733,7 +745,7 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
             table = update_table(database, competition, categories, results, apparatus)
     
     elif plot_type == 'histogram':
-        fig = update_histogram(database, competition, categories, results, apparatus)
+        fig = update_histogram(database, competition, categories, results, apparatus,xaxis_var)
         table = update_table(database, competition, categories, results, apparatus)
     
     return fig, table
