@@ -510,34 +510,6 @@ overview_layout = html.Div([
     dbc.Container([
         html.H3('Interactive Bubble and  Histogram Plots'),
         
-        # html.P("Understanding the Interactive Bubble Plot and Data Table:"),
-        # html.Ol([
-        #     html.Li("The bubble plot visualizes scores with bubbles representing athletes. The x-axis shows the E score, and the y-axis shows the D score."),
-        #     html.Li("The size of the bubble corresponds to the athlete's overall score, and the color intensity represents the score magnitude."),
-        #     html.Li("Hover over a bubble to see detailed information, including the athlete's name, category, and scores."),
-        #     html.Li("Clicking a bubble highlights the corresponding athlete's row in the data table."),
-        #     html.Li("The data table provides a ranked list of athletes based on the selected criteria, with columns for rank, athlete name, category, D score, E score, and total score."),
-        #     html.Li("Rows in the data table are highlighted when corresponding bubbles are clicked, making it easier to cross-reference data between the plot and table."),
-        #     html.Li("Use the toolbar above the bubble plot to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
-        # ]),
-        
-        # html.Div([
-        #     html.Div("Plot Type (Bubble or Histogram)", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
-        #     dcc.Dropdown(
-        #         id='plot-dropdown',
-        #         # value='SR21', #initializing with this value for now - should be dynamic
-        #         style=dropdown_style1,
-        #         multi=False # Enable multi-select
-        #     )
-        # ], style={'marginBottom': '10px'}),
-        
-        # dbc.Switch(
-        # id='plot-switch',
-        # label='Bubble Plot',
-        # value=True,  # True = Bubble, False = Histogram
-        # style={'margin-bottom': '10px'}
-        #     ),
-        
         dbc.RadioItems(
         id='plot-toggle',
         options=[
@@ -547,20 +519,6 @@ overview_layout = html.Div([
         value='bubble',
         inline=True
             ),
-        
-        # dbc.RadioItems(
-        # id='hist-xaxis-toggle',
-        # options=[
-        #     {'label': 'D Score', 'value': 'D'},
-        #     {'label': 'E Score', 'value': 'E'},
-        #     {'label': 'ND', 'value': 'ND'},
-        #     {'label': 'Bonus', 'value': 'Bonus'},
-        #     {'label': 'Total Score', 'value': 'Score'}
-        # ],
-        # value='Score',
-        # inline=True,
-        #     ),
-
 
         html.Div([
             dcc.Dropdown(
@@ -579,30 +537,12 @@ overview_layout = html.Div([
         id='hist-options-row',  # <--- Add this
         style={'display': 'none', 'marginBottom': '10px'}  # initially hidden
         ),
-
-
-        # dbc.Row(
-        #     dbc.RadioItems(
-        #         id='hist-xaxis-toggle',
-        #         options=[
-        #             {'label': 'D Score', 'value': 'D'},
-        #             {'label': 'E Score', 'value': 'E'},
-        #             {'label': 'ND', 'value': 'ND'},
-        #             {'label': 'Bonus', 'value': 'Bonus'},
-        #             {'label': 'Total Score', 'value': 'Score'}
-        #         ],
-        #         value='Score',
-        #         inline=True,
-        #     ),
-        #     id='hist-options-row',  # container id
-        #     style={'display': 'none', 'marginBottom': '10px'}  # initially hidden
-        # ),
-
         
         dbc.Row([
             dbc.Col(
-                dcc.Graph(id='bubble-plot', config={'responsive': True}),
-                style={'flex': '0 0 80%'},  # Adjust width as needed
+                dcc.Graph(id='bubble-plot', config={'responsive': True},),
+                # style={'flex': '0 0 80%'},  # Adjust width as needed
+                style={'height': '600px', 'width': '80%'}, #trying to keep it big so it doesnt overlap with table
             )
         ], style={'display': 'flex'}),
         
@@ -616,11 +556,13 @@ overview_layout = html.Div([
                 style={'flex': '0 0 100%'},  # Adjust width as needed
             )
         ], style={'display': 'flex'})
-    ], style={'boxSizing': 'border-box', 'position': 'relative', 'width': '100%', 'height': '0', 'paddingBottom': '60%'}),
-    
+    ], 
+    style={'boxSizing': 'border-box', 'position': 'relative', 'width': '100%', 'height': '0', 'paddingBottom': '60%'}),
+    # style={'boxSizing': 'border-box', 'width': '100%'}),
+
     
     #bottom note:
-    # html.P('for any additional inquiries, please email info@stoianalytics.com')
+    # html.P('for any inquiries, please contact info@stoianalytics.com')
         
     
 ])

@@ -29,7 +29,7 @@ competitions = ["JAKARTA"]
 competition_series = ["WorldChamps2025"]
 categories = ["SR"]
 # days = ["QF","EF"]
-days = ["QF"]
+days = ["QF","AA"]
 series_acronyms = {
                     # "2025 World Cup Series": "2025 World Cup Series"
                     # "EF":"Event Finals",
@@ -40,6 +40,7 @@ series_acronyms = {
 
 competition_acronyms = {
                     "JAKARTA-QF":"Qualifcations",
+                    "JAKARTA-AA":"All Around Finals",
                     # "COTTBUS-EF":"Cottbus (EF)",
                     # "BAKU-QF":"Baku (QF)",
                     # "BAKU-EF":"Baku (EF)",
@@ -63,6 +64,7 @@ series_dates = {
 competition_dates = {
                     # "WCups2025": "2025-02-21",
                     "JAKARTA-QF":"2025-10-20",
+                    "JAKARTA-AA":"2025-10-22",
                     # "COTTBUS-EF":"2025-02-23",
                     # "BAKU-QF":"2025-03-06",
                     # "BAKU-EF":"2025-03-08",
