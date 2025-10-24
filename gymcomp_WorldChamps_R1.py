@@ -429,17 +429,7 @@ Select the Competition Data you would like to visualize through the dropdown
 """
 
 overview_layout = html.Div([
-
-    # html.H3("How to Use The Competition Overview Tab"),
-    # html.P("Follow these steps to interact with the data:"),
-
-    # html.Ol([
-    #     html.Li("Use the Competition selector to choose a competition from the dropdown list."),
-    #     html.Li("Select one or more categories using the Category selector to filter the results accordingly."),
-    #     html.Li("Choose the type of results you want to see (ex. day 1, day 2, average, best) using the Results selector."),
-    #     html.Li("Use the Apparatus selector to further refine the data by apparatus."),
-    #     html.Li("View the interactive bubble plot and data table below for detailed insights.")
-    # ]),
+    
     
     # Customized horizontal line to separate sections
     html.Hr(style={'borderTop': '3px solid #bbb'}),
@@ -489,15 +479,6 @@ overview_layout = html.Div([
             ])
         ], style={'flex': '0 0 80%'}),  # Adjust width as needed
         
-    #add some global stats later
-    #     dbc.Col([
-    #         html.Div([
-    #             html.P("Number of Athletes: 50"),
-    #             html.P("Top Score: 98.5"),
-    #             html.P("Top D Score: 6.2"),
-    #             html.P("Top E Score: 9.1"),
-    #         ], style={'paddingLeft': '20px'}) #removed border code, 'borderLeft': '1px solid #ccc'})  # Adjust padding and add a border for separation
-    #     ], style={'flex': '0 0 60%'})  # Adjust width as needed
     
     ], style={'display': 'flex', 'alignItems': 'flex-start'}),
     
@@ -546,6 +527,9 @@ overview_layout = html.Div([
             )
         ], style={'display': 'flex'}),
         
+        #bottom note:
+        html.P('note: for any inquiries, please contact info@stoianalytics.com'),
+        
         # Customized horizontal line to separate sections
         html.Hr(style={'borderTop': '3px solid #bbb'}),
         
@@ -559,11 +543,6 @@ overview_layout = html.Div([
     ], 
     style={'boxSizing': 'border-box', 'position': 'relative', 'width': '100%', 'height': '0', 'paddingBottom': '60%'}),
     # style={'boxSizing': 'border-box', 'width': '100%'}),
-
-    
-    #bottom note:
-    # html.P('for any inquiries, please contact info@stoianalytics.com')
-        
     
 ])
     
