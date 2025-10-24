@@ -190,7 +190,8 @@ def get_color(score, min_score, max_score):
 def update_histogram(database, competition, categories, results, apparatus, xaxis_var='Score'):
     bubble_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
     if not bubble_data:
-        return px.histogram()  # empty figure
+        # return px.histogram()  # empty figure
+        return go.Figure() # empty figure
 
     # Extract valid scores
     # scores = [stats['Score'] for stats in bubble_data.values() if not np.isnan(stats['Score']) and stats['Score'] > 0]
@@ -201,8 +202,28 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
         val = stats.get(xaxis_var)
         if val is not None and not np.isnan(val) and stats.get("D")!=0: #if a score is zero, I dont want it on the list I get
             values.append(val)
-
-
+    
+    #check if we have values
+    #sometimes we have no entries (ex. no stick bonus on PH, or no sticks in a dataset, or no ND in dataset)
+    if not values:
+        fig = go.Figure()
+        fig.add_annotation(
+            text="No data available for this selection",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5,  # center of the chart
+            showarrow=False,
+            font=dict(size=16, color="gray"),
+            align="center",
+        )
+        # Optional layout tweaks so it still looks like a chart area
+        fig.update_layout(
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+            template="plotly_white",
+        )
+        # return go.Figure() # empty figure
+        return fig
+    
     
     fig = px.histogram(
         # x=scores,
@@ -235,8 +256,13 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
     
         
     # Optional: specify bin size manually (e.g., every 0.5 points)
-    fig.update_traces(xbins=dict(start=np.floor(min(values)*10)/10-.1, end=np.ceil(max(values)*10)/10+.1, size=0.1))
-    
+    val_min = np.floor(np.min(values) * 10) / 10 - 0.1
+    val_max = np.ceil(np.max(values) * 10) / 10 + 0.1
+    val_range = val_max - val_min
+    if val_range < 1.0:
+        val_max = val_min + 1.0
+
+    fig.update_traces(xbins=dict(start=val_min, end=val_max, size=0.1))
     #do some statistical calcs
     # Compute mean and std for the distribution
     mean = np.mean(values)
