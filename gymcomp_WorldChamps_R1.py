@@ -260,9 +260,16 @@ def update_histogram(database, competition, categories, results, apparatus, xaxi
     val_max = np.ceil(np.max(values) * 10) / 10 + 0.1
     val_range = val_max - val_min
     if val_range < 1.0:
+        # Expand symmetrically around the data, but not below 0
+        mid = np.round(np.mean(values),1)#round to 1 decimal
+        val_min = mid-0.5
         val_max = val_min + 1.0
 
     fig.update_traces(xbins=dict(start=val_min, end=val_max, size=0.1))
+    # Explicitly set axis range so Plotly doesn’t autozoom
+    fig.update_xaxes(range=[val_min, val_max])
+    
+    
     #do some statistical calcs
     # Compute mean and std for the distribution
     mean = np.mean(values)
