@@ -1310,7 +1310,31 @@ def update_score_graph(athlete, competition):
                     max_score = score
             # print(generate_bonus_color(barplot_colours['E'][i]))
             
+            #get rid of nans
+            Bonus_scores = [0 if np.isnan(B) else B for B in Bonus_scores]
+            ND_scores = [0 if np.isnan(ND) else ND for ND in ND_scores]
             # Create stacked bar trace for D and E scores and Bonus
+            
+            
+            stacked_trace_d = go.Bar(
+                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
+
+                y=d_scores,
+                name=f'D score ({comp})',
+                # hoverinfo='y+name',
+                hovertext=[f'{d:.3f}' for d in d_scores],
+                hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+                marker_color=barplot_colours['D'][i],  # Set color for D scores
+                # marker_pattern='cross',
+                # marker=dict(pattern='+', pattern_fgcolor='black'),
+                # marker_pattern_fgcolor=barplot_colours['E'][day],
+                # offsetgroup=comp,  # Group by day
+                legendgroup=comp,  # Group by day
+                width = width,
+            )
+            
             stacked_trace_Bonus = go.Bar(
                 # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
                 x=[j + offset_multiplier for j in range(len(plot_apparatus))],
@@ -1337,28 +1361,9 @@ def update_score_graph(athlete, competition):
                 # marker_pattern_fgcolor=barplot_colours['E'][day],
                 # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
+                base=d_scores,  # Offset by D scores
                 width = width,
             )
-            
-            stacked_trace_d = go.Bar(
-                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
-                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
-
-                y=d_scores,
-                name=f'D score ({comp})',
-                # hoverinfo='y+name',
-                hovertext=[f'{d:.3f}' for d in d_scores],
-                hoverinfo='text+name',  # Use custom hover text and show trace name
-                
-                marker_color=barplot_colours['D'][i],  # Set color for D scores
-                # marker_pattern='cross',
-                # marker=dict(pattern='+', pattern_fgcolor='black'),
-                # marker_pattern_fgcolor=barplot_colours['E'][day],
-                # offsetgroup=comp,  # Group by day
-                legendgroup=comp,  # Group by day
-                width = width,
-            )
-            
             
             stacked_trace_e = go.Bar(
                 # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
@@ -1373,17 +1378,18 @@ def update_score_graph(athlete, competition):
                 marker_color=barplot_colours['E'][i],  # Set color for E scores
                 # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
-                base=d_scores,  # Offset by D scores
+                base=d_scores+Bonus_scores,  # Offset by D scores + Bonus scores
                 width = width,
                 # Adding text above the bar plot for the whole score, truncated to 3 decimal places
-                text=[f'{d + e:.3f}' for d, e in zip(d_scores, e_scores)],
+                text=[f'{d + e + B - ND:.3f}' for d, e, B, ND in zip(d_scores, e_scores, Bonus_scores, ND_scores)],
                 textposition='outside'
             )
             
             
             traces.append(stacked_trace_d)
-            traces.append(stacked_trace_e)
             traces.append(stacked_trace_Bonus)
+            traces.append(stacked_trace_e)
+            
             
             
             # Increment the offset multiplier for the next day
