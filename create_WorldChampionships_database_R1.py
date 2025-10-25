@@ -99,8 +99,8 @@ columns = ["D Score","E Score","Penalty","Bonus","Final Score"]
 #create a dictionary where the csv appartus names are keys to desired apparatus abbreviation values
 #two-letter acronyms we want to use No AA in WCs leaving in for now!
 tlas = ["FX","PH","SR","VT1","VT2","PB","HB"] #,"AA"]
-tlas = ["FX","PH","SR","VT1","PB","HB"] #,"AA"]
-comp_tlas = ["FX","PH","SR","VT1","PB","HB"]
+# tlas = ["FX","PH","SR","VT1","PB","HB"] #,"AA"]
+comp_tlas = ["FX","PH","SR","VT1","VT2","PB","HB"]
 
 # abbrev_dict = {apparatus[0]:tlas[0],
 #                apparatus[1]:tlas[1],
@@ -344,7 +344,7 @@ for athlete in athletes:
                             #but i want the math to math
                             if math.isnan(val) and not(math.isnan(athlete_database[athlete][series][result][tla]["D"])): 
                                 #we have data for this event, but this bonus or ND is nan, lets turn it to zero for calcs to make sense
-                                print("made it here")
+                                # print("made it here")
                                 val = 0.0
                             elif val == 0:
                                 #dont know if i still need this, but keeping in case

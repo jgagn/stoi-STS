@@ -20,7 +20,7 @@ Created on Tue Mar 26 13:38:51 2024
 
 #%% HARDCODED STUFF
 
-SERIES = "WCups2025"
+SERIES = "WorldChamps2025"
 
 #%% Imports
 
@@ -119,6 +119,7 @@ dropdown_style = {'width': '50%'}  # Adjust the width as needed
 dropdown_style1 = {'width': '100%'}  # Adjust the width as needed
 dropdown_style2 = {'width': '80%'}  # Adjust the width as needed
 tlas = ['FX', 'PH', 'SR', 'VT1','VT2', 'PB', 'HB'] #remove AA for World cups, 'AA']
+# tlas = ['FX', 'PH', 'SR', 'VT1', 'PB', 'HB'] 
 exclude_keys = ["overview", "competition_acronyms", "category_acronyms","series_acronyms","competition_dates","series_dates"]
 tla_dict = {
             "FX":"Floor Exercise",
@@ -857,14 +858,14 @@ def generate_subplot(athlete):
         #get competitions
         #Also Sketchy, hardcoding series and category
         #TODO
-        # competitions = database[athlete]["WCups2025"].keys()
-        exclusions = ["category", "average", "best", "combined"]
-        competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
+        # competitions = database[athlete]["WorldChamps2025"].keys()
+        exclusions = ["category", "country", "average", "best", "combined"]
+        competitions = [k for k in database[athlete]["WorldChamps2025"].keys() if k not in exclusions]
         comp_days_date = []
         # i = 0 #temporary date counter
         for comp in competitions:
             #also sketchy, hard coding in competition seroies
-            results = [key for key in database[athlete]['WCups2025'].keys() if key not in ["category", "average", "best","combined"]]
+            results = [key for key in database[athlete]['WorldChamps2025'].keys() if key not in ["category", "average", "best","combined"]]
             for day in results:
                 date = database['competition_dates'][comp]
                 comp_days_date.append([comp,comp,date])
@@ -895,8 +896,8 @@ def generate_subplot(athlete):
             for comp,day,date in comp_days_date_sorted:
                 # print(f"comp: {comp}, day: {day}, date: {date}")
                 comp_labels.append(comp+" ("+day+")")
-                score = database[athlete]['WCups2025'][comp][tla]['Score']
-                categories.append(database[athlete]['WCups2025']['category'])
+                score = database[athlete]['WorldChamps2025'][comp][tla]['Score']
+                categories.append(database[athlete]['WorldChamps2025']['category'])
                 if score == 0:
                     score = np.nan #set to nan
                 tla_data.append(score)
@@ -1098,7 +1099,7 @@ tab2_layout = html.Div([
 #             #Super sketchy here i am hardcoding competition and category
 #             #TODO
 #             results_options = [day for day in database[athlete]["WCups2025"][competition].keys() if day != "category"]
-#             return dash.no_update, dash.no_update, [{'label': result, 'value': result} for result in results_options], None
+#             return dash.no_update, dash.no_upsdate, [{'label': result, 'value': result} for result in results_options], None
 #         else:
 #             return dash.no_update, dash.no_update, [], None
 
@@ -1112,8 +1113,8 @@ tab2_layout = html.Div([
 )
 def update_competition_dropdown(athlete):
     if athlete:
-        exclusions = ["category", "average", "best", "combined"]
-        competitions = [k for k in database[athlete]["WCups2025"].keys() if k not in exclusions]
+        exclusions = ["category","country", "average", "best", "combined"]
+        competitions = [k for k in database[athlete]["WorldChamps2025"].keys() if k not in exclusions]
         comp_options = [{'label': database['competition_acronyms'][comp], 'value': comp} for comp in competitions]
         return comp_options, None
     else:
@@ -1261,6 +1262,7 @@ def update_score_graph(athlete, competition):
             d_scores = []
             e_scores = []
             plot_apparatus = ['FX','PH','SR','VT1','VT2','PB','HB']
+            # plot_apparatus = ['FX','PH','SR','VT1','PB','HB']
             
             for app in plot_apparatus:
                 d_scores.append(database[athlete][SERIES][comp][app]['D'])
