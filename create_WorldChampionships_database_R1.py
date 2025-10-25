@@ -330,6 +330,9 @@ for athlete in athletes:
                     athlete_database[athlete][series]['best'][tla] = {}
                     athlete_database[athlete][series]['combined'][tla] = {}
                     
+                    best_day = comp+"-QF"#initialize as QF change in the loop
+                    best_score = 0.0 #initialize as zero, changes in the loop
+                        
                     for value in order: #+[Ename]:#forgot that I was treating E score differently
                         #sweep through all days, do not include category keys
                         results = [key for key in athlete_database[athlete][series].keys() if key not in ["category","country","average","best","combined"]]
@@ -350,6 +353,11 @@ for athlete in athletes:
                                 #dont know if i still need this, but keeping in case
                                 val = np.nan
                             vals.append(val)
+                            
+                            #check if this is top score
+                            if value == "Score":
+                                if val > best_score:
+                                    best_day = result
                         
                         #Now, let's get the mean and max values and store in new database
                         #because some values might be nans (if did not compete)
@@ -366,14 +374,16 @@ for athlete in athletes:
                             #if they are all nans, set to zero... #TODO test if id rather them be nans?
                             #it messes up my D vs. E score plot unfortunately right now
                             athlete_database[athlete][series]['average'][tla][value] = np.nan #0.0
-                            athlete_database[athlete][series]['best'][tla][value] = np.nan #0.0
+                            #athlete_database[athlete][series]['best'][tla][value] = np.nan #0.0
                             athlete_database[athlete][series]['combined'][tla][value] = np.nan #0.0
                             
                         else:
                             athlete_database[athlete][series]['average'][tla][value]= np.nanmean(vals)
-                            athlete_database[athlete][series]['best'][tla][value] = np.nanmax(vals)
+                            #athlete_database[athlete][series]['best'][tla][value] = np.nanmax(vals)
                             athlete_database[athlete][series]['combined'][tla][value] = np.nansum(vals)
-    
+                        
+                    #save all scores related to best final score based on best days
+                    athlete_database[athlete][series]['best'][tla] = athlete_database[athlete][series][best_day][tla]
                 else:
                     # print(f"{athlete} did not compete at {comp}")
                     pass
