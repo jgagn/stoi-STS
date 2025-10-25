@@ -1153,6 +1153,39 @@ def update_score_graph(athlete, competition):
             ND_scores = [0 if np.isnan(ND) else ND for ND in ND_scores]
             # Create stacked bar trace for D and E scores and Bonus
             
+            stacked_trace_Bonus = go.Bar(
+                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
+
+                y=Bonus_scores,
+                name="Bonus",#f'Bonus ({comp})',
+                # hoverinfo='y+name',
+                hovertext=[f'{B:.3f}' for B in Bonus_scores],
+                hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+                # marker_color = "#FFD700",#gold, bright
+                marker=dict(
+                    color="#3CB371",           # gold fill
+                    # line=dict(
+                    #     color='black',         # border color
+                    #     width=1.2              # border thickness
+                    # )
+                    # line=dict(color="#3CB371")
+                    line=dict(color="#3CB371", width=1)  # <-- border of the bars
+                ),
+                # bonus_green = "#3CB371"  # MediumSeaGreen
+
+                # marker_color = generate_bonus_color(barplot_colours['E'][i]),# Set color for Bonus scores
+                # marker_pattern='cross',
+                # marker=dict(pattern='+', pattern_fgcolor='black'),
+                # marker_pattern_fgcolor=barplot_colours['E'][day],
+                # offsetgroup=comp,  # Group by day
+                legendgroup=comp,  # Group by day
+                # legendgroup="Bonus",  # Group by day
+                # base=d_scores,  # Offset by D scores
+                width = width,
+                showlegend=(i==0)  # Only show for the first competition
+            )
             
             stacked_trace_d = go.Bar(
                 # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
@@ -1170,40 +1203,11 @@ def update_score_graph(athlete, competition):
                 # marker_pattern_fgcolor=barplot_colours['E'][day],
                 # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
+                base=Bonus_scores,#offset with bonus scores now
                 width = width,
             )
             
-            stacked_trace_Bonus = go.Bar(
-                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
-                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
-
-                y=Bonus_scores,
-                name="Bonus",#f'Bonus ({comp})',
-                # hoverinfo='y+name',
-                hovertext=[f'{B:.3f}' for B in Bonus_scores],
-                hoverinfo='text+name',  # Use custom hover text and show trace name
-                
-                # marker_color = "#FFD700",#gold, bright
-                marker=dict(
-                    color="#FFD700",           # gold fill
-                    # line=dict(
-                    #     color='black',         # border color
-                    #     width=1.2              # border thickness
-                    # )
-                    line=dict(color="#FFD700")
-                ),
-                
-                # marker_color = generate_bonus_color(barplot_colours['E'][i]),# Set color for Bonus scores
-                # marker_pattern='cross',
-                # marker=dict(pattern='+', pattern_fgcolor='black'),
-                # marker_pattern_fgcolor=barplot_colours['E'][day],
-                # offsetgroup=comp,  # Group by day
-                legendgroup=comp,  # Group by day
-                # legendgroup="Bonus",  # Group by day
-                base=d_scores,  # Offset by D scores
-                width = width,
-                showlegend=(i==0)  # Only show for the first competition
-            )
+            
             
             stacked_trace_e = go.Bar(
                 # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
@@ -1236,7 +1240,8 @@ def update_score_graph(athlete, competition):
                 hovertext=[f'{ND:.3f}' for ND in ND_scores],
                 hoverinfo='text+name',  # Use custom hover text and show trace name
                 
-                marker_color='rgba(255,0,0,0.4)',  # semi-transparent red
+                # marker_color='rgba(255,0,0,0.4)',  # semi-transparent red
+                marker_color='rgba(255,0,0,1.0)',  # bright opaque red
                 # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
                 # legendgroup="Bonus",  # Group with Bonus
