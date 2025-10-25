@@ -17,7 +17,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import chardet #to detect character encoding - making sure accents and such are saved properly in names
-
+import math
 
 #%% Setup files to import
 
@@ -315,55 +315,65 @@ for athlete in athletes:
             # try: if athlete_database[athlete][comp]:
             for day in days:
                 comp_day = comp+"-"+day
-                if comp_day in athlete_database.get(athlete, {}).get(series, {}):
-                    # print(f"{athlete} competed at {comp}")
-                    # complete statistical analysis for the days they competed
-                    # keep in mind they may not have competed on all events on all days
+                # if comp_day in athlete_database.get(athlete, {}).get(series, {}):
+                #     # print(f"{athlete} competed at {comp}")
+                #     # complete statistical analysis for the days they competed
+                #     # keep in mind they may not have competed on all events on all days
                     
-                    # athlete_database[athlete][series]['average'] = {}
-                    # athlete_database[athlete][series]['best'] = {}
-                    # athlete_database[athlete][series]['combined'] = {}
+                #     # athlete_database[athlete][series]['average'] = {}
+                #     # athlete_database[athlete][series]['best'] = {}
+                #     # athlete_database[athlete][series]['combined'] = {}
                     
-                    for tla in tlas:
-                        #query the dataframe to obtain all data
-                        athlete_database[athlete][series]['average'][tla] = {}
-                        athlete_database[athlete][series]['best'][tla] = {}
-                        athlete_database[athlete][series]['combined'][tla] = {}
+                for tla in tlas:
+                    #query the dataframe to obtain all data
+                    athlete_database[athlete][series]['average'][tla] = {}
+                    athlete_database[athlete][series]['best'][tla] = {}
+                    athlete_database[athlete][series]['combined'][tla] = {}
+                    
+                    for value in order: #+[Ename]:#forgot that I was treating E score differently
+                        #sweep through all days, do not include category keys
+                        results = [key for key in athlete_database[athlete][series].keys() if key not in ["category","country","average","best","combined"]]
                         
-                        for value in order+[Ename]:#forgot that I was treating E score differently
-                            #sweep through all days, do not include category keys
-                            results = [key for key in athlete_database[athlete][series][comp+"-"+day].keys() if key not in ["category","average","best","combined"]]
+                        vals = []
+                        
+                        for result in results:
+                            # print(f"result: {result}")
+                            val = athlete_database[athlete][series][result][tla][value]
+                            # if it is a zero, make it a nan
+                            #sometimes now I have nan for bonus or ND
+                            #but i want the math to math
+                            if math.isnan(val) and not(math.isnan(athlete_database[athlete][series][result][tla]["D"])): 
+                                #we have data for this event, but this bonus or ND is nan, lets turn it to zero for calcs to make sense
+                                print("made it here")
+                                val = 0.0
+                            elif val == 0:
+                                #dont know if i still need this, but keeping in case
+                                val = np.nan
+                            vals.append(val)
+                        
+                        #Now, let's get the mean and max values and store in new database
+                        #because some values might be nans (if did not compete)
+                        #use nanmean and nanmax so it ignores them
+                        #however, if all vals are nan, then just put nan
+                        # print(f"vals: {vals}")
+                        
+                        # Check if all values are NaN
+                        
+                        #I want to filter by Best final scores...
+                        #I think best will need to be dealth with differently.
+                        
+                        if np.all(np.isnan(vals)):
+                            #if they are all nans, set to zero... #TODO test if id rather them be nans?
+                            #it messes up my D vs. E score plot unfortunately right now
+                            athlete_database[athlete][series]['average'][tla][value] = np.nan #0.0
+                            athlete_database[athlete][series]['best'][tla][value] = np.nan #0.0
+                            athlete_database[athlete][series]['combined'][tla][value] = np.nan #0.0
                             
-                            vals = []
-                            
-                            for result in results:
-                                # print(f"result: {result}")
-                                val = athlete_database[athlete][series][comp+"-"+day][tla][value]
-                                # if it is a zero, make it a nan
-                                if val == 0:
-                                    val = np.nan
-                                vals.append(val)
-                            
-                            #Now, let's get the mean and max values and store in new database
-                            #because some values might be nans (if did not compete)
-                            #use nanmean and nanmax so it ignores them
-                            #however, if all vals are nan, then just put nan
-                            # print(f"vals: {vals}")
-                            
-                            # Check if all values are NaN
-                            
-                            if np.all(np.isnan(vals)):
-                                #if they are all nans, set to zero... #TODO test if id rather them be nans?
-                                #it messes up my D vs. E score plot unfortunately right now
-                                athlete_database[athlete][series]['average'][tla][value] = np.nan #0.0
-                                athlete_database[athlete][series]['best'][tla][value] = np.nan #0.0
-                                athlete_database[athlete][series]['combined'][tla][value] = np.nan #0.0
-                                
-                            else:
-                                athlete_database[athlete][series]['average'][tla][value]= np.nanmean(vals)
-                                athlete_database[athlete][series]['best'][tla][value] = np.nanmax(vals)
-                                athlete_database[athlete][series]['combined'][tla][value] = np.nansum(vals)
-        
+                        else:
+                            athlete_database[athlete][series]['average'][tla][value]= np.nanmean(vals)
+                            athlete_database[athlete][series]['best'][tla][value] = np.nanmax(vals)
+                            athlete_database[athlete][series]['combined'][tla][value] = np.nansum(vals)
+    
                 else:
                     # print(f"{athlete} did not compete at {comp}")
                     pass
