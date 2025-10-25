@@ -503,6 +503,7 @@ overview_layout = html.Div([
                     html.Div("Results:", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
                     dcc.Dropdown(
                         id='results-dropdown',
+                        # options=[{'label': tla_dict[app], 'value': app} for app in tlas],
                         # value='average', #initializing with this value for now - should be dynamic
                         style=dropdown_style1
                     
@@ -642,7 +643,9 @@ def update_results_dropdown(competition, categories, database):
         
         common_elements = find_common_elements(results_options)
         # print(common_elements)
-                
+        
+        #need to show the acronyms of these common elements - right now it breaks the selection
+        common_acronyms = [database['competition_acronyms'][c] for c in common_elements]
         
         return [{'label': result, 'value': result} for result in common_elements + ["average","best","combined"]]
     else:
@@ -925,7 +928,9 @@ def generate_subplot(athlete):
             tla_data = []
             for comp,day,date in comp_days_date_sorted:
                 # print(f"comp: {comp}, day: {day}, date: {date}")
-                comp_labels.append(comp+" ("+day+")")
+                # comp_labels.append(comp+" ("+day+")")
+                #^right now comp and day returning same value so changing
+                comp_labels.append(comp)
                 score = database[athlete]['WorldChamps2025'][comp][tla]['Score']
                 categories.append(database[athlete]['WorldChamps2025']['category'])
                 if score == 0:
@@ -1013,6 +1018,8 @@ def create_apparatus_legend(tla_dict):
     return html.Ul([html.Li(f"{tla}: {description}") for tla, description in tla_dict.items()])
 def create_competition_legend(competition_acronyms):
     return html.Ul([html.Li(f"{abbreviation}: {competition}") for abbreviation, competition in competition_acronyms.items()])
+    # ^ current dataset has abbreviation and competition as same so just removing it for now
+    # return html.Ul([html.Li(f"{abbreviation}") for abbreviation, competition in competition_acronyms.items()])
 
 
 tab2_layout = html.Div([

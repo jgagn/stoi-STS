@@ -39,7 +39,7 @@ series_acronyms = {
                     }
 
 competition_acronyms = {
-                    "JAKARTA-QF":"Qualifcations",
+                    "JAKARTA-QF":"Qualifications",
                     "JAKARTA-AA":"All Around Finals",
                     # "COTTBUS-EF":"Cottbus (EF)",
                     # "BAKU-QF":"Baku (QF)",
