@@ -404,8 +404,15 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['D score'] = df['D'].map('{:.3f}'.format)
         df['E score'] = df['E'].map('{:.3f}'.format)
         df['Score'] = df['Score'].map('{:.3f}'.format)
-        df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
-        df['Bonus'] = df['Bonus'].map('{:.1f}'.format) #1 decimal point for bonus
+        
+        # print(results)
+        if results == "average":
+            #due to averaging, nice to add another decimal point
+            df['ND'] = df['ND'].map('{:.2f}'.format) #2 decimal point for neutral deductions
+            df['Bonus'] = df['Bonus'].map('{:.2f}'.format) #2 decimal point for bonus
+        else: 
+            df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
+            df['Bonus'] = df['Bonus'].map('{:.1f}'.format) #1 decimal point for bonus
         
         # create "Category" column with capital "C" and map the acronyms to the full text
         df['Category'] = df['category'].map(database['category_acronyms'])
