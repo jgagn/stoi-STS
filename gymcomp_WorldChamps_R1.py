@@ -1378,17 +1378,39 @@ def update_score_graph(athlete, competition):
                 marker_color=barplot_colours['E'][i],  # Set color for E scores
                 # offsetgroup=comp,  # Group by day
                 legendgroup=comp,  # Group by day
-                base=d_scores+Bonus_scores,  # Offset by D scores + Bonus scores
+                # base=d_scores+Bonus_scores,  # Offset by D scores + Bonus scores
+                base=[d + B for d, B in zip(d_scores, Bonus_scores)],
                 width = width,
                 # Adding text above the bar plot for the whole score, truncated to 3 decimal places
-                text=[f'{d + e + B - ND:.3f}' for d, e, B, ND in zip(d_scores, e_scores, Bonus_scores, ND_scores)],
+                text=[f'{d + e + B + ND:.3f}' for d, e, B, ND in zip(d_scores, e_scores, Bonus_scores, ND_scores)],
                 textposition='outside'
             )
             
+            stacked_trace_ND = go.Bar(
+                # x=[i + offset_multiplier for i in range(len(plot_apparatus))],  # Adjust x-location based on offset_multiplier
+                x=[j + offset_multiplier for j in range(len(plot_apparatus))],
+                y=ND_scores,
+                name=f'ND ({comp})',
+                #custom hover text
+                # hoverinfo='y+name',
+                hovertext=[f'{ND:.3f}' for ND in ND_scores],
+                hoverinfo='text+name',  # Use custom hover text and show trace name
+                
+                marker_color='rgba(255,0,0,0.4)',  # semi-transparent red
+                # offsetgroup=comp,  # Group by day
+                legendgroup=comp,  # Group by day
+                # base=d_scores+Bonus_scores+e_scores,  # Offset by D scores + Bonus scores + E scores
+                base=[d + e + B for d, e, B in zip(d_scores, e_scores, Bonus_scores)],  # element-wise sum
+                width = width,
+                # Adding text above the bar plot for the whole score, truncated to 3 decimal places
+                # text=[f'{d + e + B - ND:.3f}' for d, e, B, ND in zip(d_scores, e_scores, Bonus_scores, ND_scores)],
+                # textposition='outside'
+            )
             
             traces.append(stacked_trace_d)
             traces.append(stacked_trace_Bonus)
             traces.append(stacked_trace_e)
+            traces.append(stacked_trace_ND)
             
             
             
