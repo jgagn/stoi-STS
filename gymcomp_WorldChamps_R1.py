@@ -614,7 +614,7 @@ overview_layout = html.Div([
     html.H3('Welcome!'),
     html.P('Stoi Analytics is a sports data analytics project, learn more at our website:'),
     html.A("www.stoianalytics.com", href="https://www.stoianalytics.com/", target="_blank"),
-    html.P('Quick notes: this dataset is from the 2025 FIG World Artistic Gymnastics Championships'),
+    html.P("Dataset: This data is for the Men's Artistic Gymnastics (MAG) results from the 2025 FIG World Artistic Gymnastics Championships"),
     html.P('note: for any inquiries, please contact info@stoianalytics.com'),
 
     
