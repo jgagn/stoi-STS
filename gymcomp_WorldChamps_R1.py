@@ -365,6 +365,7 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
         print(data)
     return data
 
+#OLD CODE BEFORE TABLE WAS FILTERABLE
 # def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
 #     # Filter the database based on selected day and apparatus
 #     # filtered_data = {name: stats for name, values in database.items() if day in values for app, stats in values[day].items() if app == apparatus}
@@ -480,7 +481,6 @@ def update_table(database, competition, categories, results, apparatus, selected
         df['ND'] = df['ND'].map('{:.2f}'.format)
         df['Bonus'] = df['Bonus'].map('{:.2f}'.format)
     else:
-        
         df['ND'] = df['ND'].map('{:.1f}'.format)
         df['Bonus'] = df['Bonus'].map('{:.1f}'.format)
 
@@ -504,6 +504,18 @@ def update_table(database, competition, categories, results, apparatus, selected
             }
         ]
 
+    # Generate HTML table with highlighted row if a selected athlete is provided
+    #no longer works with filterable data fix #TODO
+    table_rows = []
+    for i in range(len(df)):
+        row_data = df.iloc[i]
+        background_color = 'yellow' if row_data['Athlete name'] == selected_athlete else ('white' if i % 2 == 0 else '#e6f2ff') #making it blue if not selected
+        table_row = html.Tr(
+            [html.Td(row_data[col], style={'background-color': background_color, 'padding': '10px'}) for col in df.columns]
+        )
+        table_rows.append(table_row)
+
+
     table = dash_table.DataTable(
         columns=[{"name": i, "id": i, "deletable": False} for i in df.columns],
         data=df.to_dict('records'),
@@ -520,7 +532,8 @@ def update_table(database, competition, categories, results, apparatus, selected
             'width': 'auto',            # let table width be its content width
             'minWidth': '0',            # helps prevent flex/min-width issues
             'overflowX': 'auto',
-            'display': 'inline-block'   # key: make table act like inline-block within wrapper
+            'display': 'inline-block',   # key: make table act like inline-block within wrapper
+            # style_as_list_view=True,
         },
     
         # make cells size to content (use minWidth 0 to avoid forcing stretch)
@@ -532,6 +545,13 @@ def update_table(database, competition, categories, results, apparatus, selected
             'textAlign': 'center',
             'padding': '6px 10px'
         },
+        # Hardcode specific widths - doesnt seem respected
+        # style_cell_conditional=[
+        #     {'if': {'column_id': 'athlete'}, 'width': '25%'},
+        #     {'if': {'column_id': 'score'}, 'width': '10%'},
+        #     {'if': {'column_id': 'event'}, 'width': '30%'},
+        #     {'if': {'column_id': 'country'}, 'width': '15%'},
+        # ],
 
         # page_size=20                      # optional pagination
     )
@@ -1122,24 +1142,10 @@ def create_competition_legend(competition_acronyms):
 
 tab2_layout = html.Div([
     
-    html.H3("How to Use The Individual Athlete Analysis Tab"),
-    html.P("Follow these steps to interact with the data:"),
-    html.Ol([
-        html.Li("Select an athlete using the Athlete dropdown to view their scores across different competitions."),
-        html.Li("View the interactive subplot below to see the athlete's performance across all apparatus over multiple competitions."),
-        html.Li("Click on the toolbar above the plots to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
-    ]),
-    
-    #legends
-    html.P("Apparatus Legend"),
-    create_apparatus_legend(tla_dict),
-    html.P("Competition Legend"),
-    create_competition_legend(database['competition_acronyms']),
-    
     # Customized horizontal line to separate sections
     html.Hr(style={'borderTop': '3px solid #bbb'}),
     
-    html.H3('Plot Athlete Scores Across Competitions'),
+    html.H3('Plot Athlete Scores Across Competition Days'),
     
     html.Div([
         html.Div("Athlete", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
@@ -1163,13 +1169,12 @@ tab2_layout = html.Div([
 
     html.H3('Score Breakdown by Competition'),
     
-    
-    html.P("Follow these steps to use the Score Breakdown Plot:"),
-    html.Ol([
-        html.Li("Use the Competition and Results dropdowns to filter the score breakdown by specific competitions and results."),
-        html.Li("Hover over the bars in the score breakdown plot to see detailed D and E scores for each apparatus."),
-        html.Li("Click on the toolbar above the plots to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
-    ]),
+    # html.P("Follow these steps to use the Score Breakdown Plot:"),
+    # html.Ol([
+    #     html.Li("Use the Competition and Results dropdowns to filter the score breakdown by specific competitions and results."),
+    #     html.Li("Hover over the bars in the score breakdown plot to see detailed D and E scores for each apparatus."),
+    #     html.Li("Click on the toolbar above the plots to save the plot as an image, zoom in or out, and crop specific sections of the plot for a closer view.")
+    # ]),
     
     
     html.Div([
