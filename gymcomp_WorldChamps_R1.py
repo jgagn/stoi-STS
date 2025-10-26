@@ -578,9 +578,15 @@ Select the Competition Data you would like to visualize through the dropdown
 """
 
 overview_layout = html.Div([
-    
-    
     # Customized horizontal line to separate sections
+    html.Hr(style={'borderTop': '3px solid #bbb'}),
+    html.H3('Welcome!'),
+    html.P('Stoi Analytics is a sports data analytics project, learn more at our website:'),
+    html.A("www.stoianalytics.com", href="https://www.stoianalytics.com/", target="_blank"),
+    html.P('Quick notes: this dataset is from the 2025 FIG World Artistic Gymnastics Championships'),
+    html.P('note: for any inquiries, please contact info@stoianalytics.com'),
+
+    
     html.Hr(style={'borderTop': '3px solid #bbb'}),
     html.H3('Competition Data Selection'),
 
@@ -588,7 +594,7 @@ overview_layout = html.Div([
         dbc.Col([
             html.Div([
                 html.Div([
-                    html.Div("Competition", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
+                    html.Div("Competition:", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
                     dcc.Dropdown(
                         id='competition-dropdown',
                         # options=[{'label': database['series_acronyms'][comp], 'value': comp} for comp in database['overview'].keys()],
@@ -599,7 +605,7 @@ overview_layout = html.Div([
                     )
                 ], style={'marginBottom': '10px'}),
                 html.Div([
-                    html.Div("Category (can select more than 1):", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
+                    html.Div("Category:", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
                     dcc.Dropdown(
                         id='category-dropdown',
                         # value='SR21', #initializing with this value for now - should be dynamic
@@ -677,8 +683,7 @@ overview_layout = html.Div([
             )
         ], style={'display': 'flex'}),
         
-        #bottom note:
-        html.P('note: for any inquiries, please contact info@stoianalytics.com'),
+        
         
         # Customized horizontal line to separate sections
         html.Hr(style={'borderTop': '3px solid #bbb'}),
@@ -1619,7 +1624,7 @@ tab3_layout = html.Div([
             ),
         ], width=6),
         dbc.Col([
-            html.Div("Category (can select more than 1):", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
+            html.Div("Category:", style={'marginRight': '10px', 'verticalAlign': 'middle'}),
             dcc.Dropdown(
                 id='category-dropdown3',
                 style=dropdown_style2,
