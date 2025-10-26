@@ -366,197 +366,228 @@ def update_bubble_plot(database, competition, categories, results, apparatus):
     return data
 
 #OLD CODE BEFORE TABLE WAS FILTERABLE
-# def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
-#     # Filter the database based on selected day and apparatus
-#     # filtered_data = {name: stats for name, values in database.items() if day in values for app, stats in values[day].items() if app == apparatus}
-    
-#     table_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
-    
-#     # Ensure that the table_data dictionary is not empty
-#     if not table_data:
-#         # print("no table data")
-#         table = html.Table()
-#     else:
-#         # print("we have table data!")
-#         # Flatten the dictionary and convert to DataFrame
-#         df = pd.DataFrame.from_dict(table_data, orient='index')
-        
-#         # Check if the DataFrame has the expected columns
-#         expected_columns = ['Score', 'E']  # Add other expected columns here
-#         if not set(expected_columns).issubset(df.columns):
-#             return None
-        
-#         # Sort DataFrame by Score in descending order (if tie, sort by E score for now)
-#         df = df.sort_values(by=['Score', 'E'], ascending=[False, False])
-        
-#         # Keep only rows with a valid D  score (not NaN or zero)
-#         # sometimes a legitimate score can be zero so best to check
-#         # df = df[(df['D'].notna() & (df['D'] != 0)) | (df['E'].notna() & (df['E'] != 0))]
-#         df = df[(df['D'].notna() & (df['D'] != 0))]
-        
-#         # print(f"df: {df}")
-#         # Reset index to include Athlete name as a column
-#         df = df.reset_index().rename(columns={'index': 'Athlete name'})
-        
-#         #Fill any nans to 0.000
-#         df = df.fillna(0.000)
-        
-#         # Truncate score values to 3 decimal points (do not round)
-#         df['D score'] = df['D'].map('{:.3f}'.format)
-#         df['E score'] = df['E'].map('{:.3f}'.format)
-#         df['Score'] = df['Score'].map('{:.3f}'.format)
-        
-#         # print(results)
-#         if results == "average":
-#             #due to averaging, nice to add another decimal point
-#             df['ND'] = df['ND'].map('{:.2f}'.format) #2 decimal point for neutral deductions
-#             df['Bonus'] = df['Bonus'].map('{:.2f}'.format) #2 decimal point for bonus
-#         else: 
-#             df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
-#             df['Bonus'] = df['Bonus'].map('{:.1f}'.format) #1 decimal point for bonus
-        
-#         # create "Category" column with capital "C" and map the acronyms to the full text
-#         df['Category'] = df['category'].map(database['category_acronyms'])
-        
-#         # create "Country column"
-#         df['Country'] = df['country']
-        
-#         # Add rank column
-#         df['Rank'] = df.index + 1
-        
-#         # Reorder columns
-#         df = df[['Rank', 'Athlete name', 'Country','Category','D score', 'E score','ND' ,'Bonus','Score']]
-        
-#         # Remove rows where 'E score' is NaN or 0.0
-#         df_cleaned = df[~(df['E score'].isna() | (df['E score'] == 0.0))]
-#         df = df_cleaned
-        
-#         # Generate HTML table with highlighted row if a selected athlete is provided
-#         table_rows = []
-#         for i in range(len(df)):
-#             row_data = df.iloc[i]
-#             background_color = 'yellow' if row_data['Athlete name'] == selected_athlete else ('white' if i % 2 == 0 else '#e6f2ff') #making it blue if not selected
-#             table_row = html.Tr(
-#                 [html.Td(row_data[col], style={'background-color': background_color, 'padding': '10px'}) for col in df.columns]
-#             )
-#             table_rows.append(table_row)
-        
-#         table = html.Table(
-
-#             [html.Tr([html.Th(col, style={'padding': '10px', 'background-color': '#cce7ff'}) for col in df.columns])] +
-#             # Body
-#             table_rows,
-#             style={'border-collapse': 'collapse', 'width': 'auto'}
-            
-#         )
-    
-#     return table
-
 def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
+    # Filter the database based on selected day and apparatus
+    # filtered_data = {name: stats for name, values in database.items() if day in values for app, stats in values[day].items() if app == apparatus}
+    
     table_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
     
+    # Ensure that the table_data dictionary is not empty
     if not table_data:
-        return dash_table.DataTable()  # empty table
-    
-    df = pd.DataFrame.from_dict(table_data, orient='index')
-
-    # Fill missing columns and NaNs
-    expected_columns = ['Score', 'E', 'D', 'ND', 'Bonus', 'category', 'country']
-    for col in expected_columns:
-        if col not in df.columns:
-            df[col] = 0.0
-
-    df = df.fillna(0.0)
-    
-    # Keep only rows with a valid D  score (not NaN or zero)
-    # sometimes a legitimate score can be zero so best to check
-    # df = df[(df['D'].notna() & (df['D'] != 0)) | (df['E'].notna() & (df['E'] != 0))]
-    df = df[(df['D'].notna() & (df['D'] != 0))]
-
-    # Format scores
-    df['D score'] = df['D'].map('{:.3f}'.format)
-    df['E score'] = df['E'].map('{:.3f}'.format)
-    df['Score'] = df['Score'].map('{:.3f}'.format)
-    if results == "average":
-        df['ND'] = df['ND'].map('{:.2f}'.format)
-        df['Bonus'] = df['Bonus'].map('{:.2f}'.format)
+        # print("no table data")
+        table = html.Table()
     else:
-        df['ND'] = df['ND'].map('{:.1f}'.format)
-        df['Bonus'] = df['Bonus'].map('{:.1f}'.format)
+        # print("we have table data!")
+        # Flatten the dictionary and convert to DataFrame
+        df = pd.DataFrame.from_dict(table_data, orient='index')
+        
+        # Check if the DataFrame has the expected columns
+        expected_columns = ['Score', 'E']  # Add other expected columns here
+        if not set(expected_columns).issubset(df.columns):
+            return None
+        
+        # Sort DataFrame by Score in descending order (if tie, sort by E score for now)
+        df = df.sort_values(by=['Score', 'E'], ascending=[False, False])
+        
+        # Keep only rows with a valid D  score (not NaN or zero)
+        # sometimes a legitimate score can be zero so best to check
+        # df = df[(df['D'].notna() & (df['D'] != 0)) | (df['E'].notna() & (df['E'] != 0))]
+        df = df[(df['D'].notna() & (df['D'] != 0))]
+        
+        # print(f"df: {df}")
+        # Reset index to include Athlete name as a column
+        df = df.reset_index().rename(columns={'index': 'Athlete name'})
+        
+        #Fill any nans to 0.000
+        df = df.fillna(0.000)
+        
+        # Truncate score values to 3 decimal points (do not round)
+        df['D score'] = df['D'].map('{:.3f}'.format)
+        df['E score'] = df['E'].map('{:.3f}'.format)
+        df['Score'] = df['Score'].map('{:.3f}'.format)
+        
+        # print(results)
+        if results == "average":
+            #due to averaging, nice to add another decimal point
+            df['ND'] = df['ND'].map('{:.2f}'.format) #2 decimal point for neutral deductions
+            df['Bonus'] = df['Bonus'].map('{:.2f}'.format) #2 decimal point for bonus
+        else: 
+            df['ND'] = df['ND'].map('{:.1f}'.format) #1 decimal point for neutral deductions
+            df['Bonus'] = df['Bonus'].map('{:.1f}'.format) #1 decimal point for bonus
+        
+        # create "Category" column with capital "C" and map the acronyms to the full text
+        df['Category'] = df['category'].map(database['category_acronyms'])
+        
+        # create "Country column"
+        df['Country'] = df['country']
+        
+        # Add rank column
+        df['Rank'] = df.index + 1
+        
+        # Reorder columns
+        df = df[['Rank', 'Athlete name', 'Country','Category','D score', 'E score','ND' ,'Bonus','Score']]
+        
+        # Remove rows where 'E score' is NaN or 0.0
+        df_cleaned = df[~(df['E score'].isna() | (df['E score'] == 0.0))]
+        df = df_cleaned
+        
+        # Generate HTML table with highlighted row if a selected athlete is provided
+        # table_rows = []
+        # for i in range(len(df)):
+        #     row_data = df.iloc[i]
+        #     background_color = 'yellow' if row_data['Athlete name'] == selected_athlete else ('white' if i % 2 == 0 else '#e6f2ff') #making it blue if not selected
+        #     table_row = html.Tr(
+        #         [html.Td(row_data[col], style={'background-color': background_color, 'padding': '10px'}) for col in df.columns]
+        #     )
+        #     table_rows.append(table_row),
+        
+        # table = html.Table(
 
-    # Add extra columns
-    df['Category'] = df['category'].map(database['category_acronyms'])
-    df['Country'] = df['country']
-    df['Athlete name'] = df.index
-    df['Rank'] = range(1, len(df) + 1)
-
-    # Reorder columns
-    df = df[['Rank', 'Athlete name', 'Country', 'Category', 'D score', 'E score', 'ND', 'Bonus', 'Score']]
-
-    # Highlight selected athlete
-    style_data_conditional = []
-    if selected_athlete:
-        style_data_conditional = [
-            {
-                'if': {'filter_query': f'{{Athlete name}} = "{selected_athlete}"'},
-                'backgroundColor': 'yellow',
-                'fontWeight': 'bold'
-            }
-        ]
-
-    # Generate HTML table with highlighted row if a selected athlete is provided
-    #no longer works with filterable data fix #TODO
-    table_rows = []
-    for i in range(len(df)):
-        row_data = df.iloc[i]
-        background_color = 'yellow' if row_data['Athlete name'] == selected_athlete else ('white' if i % 2 == 0 else '#e6f2ff') #making it blue if not selected
-        table_row = html.Tr(
-            [html.Td(row_data[col], style={'background-color': background_color, 'padding': '10px'}) for col in df.columns]
-        )
-        table_rows.append(table_row)
+        #     [html.Tr([html.Th(col, style={'padding': '10px', 'background-color': '#cce7ff'}) for col in df.columns])] +
+        #     # Body
+        #     table_rows,
+        #     style={'border-collapse': 'collapse', 'width': 'auto'}
+            
+        # )
 
 
-    table = dash_table.DataTable(
-        columns=[{"name": i, "id": i, "deletable": False} for i in df.columns],
-        data=df.to_dict('records'),
-        sort_action='native',            # allow sorting
-        filter_action='native',          # allow filtering
-        # style_data_conditional=style_data_conditional,
-        style_header={
-            'backgroundColor': '#cce7ff',
-            'fontWeight': 'bold',
-            'textAlign': 'center',
-        },
-        # IMPORTANT: try inline-block + width:auto on the table container
-        style_table={
-            'width': 'auto',            # let table width be its content width
-            'minWidth': '0',            # helps prevent flex/min-width issues
-            'overflowX': 'auto',
-            'display': 'inline-block',   # key: make table act like inline-block within wrapper
-            # style_as_list_view=True,
-        },
-    
-        # make cells size to content (use minWidth 0 to avoid forcing stretch)
-        style_cell={
-            'minWidth': '0px',
-            'width': 'auto',
-            'maxWidth': '200px',
-            'whiteSpace': 'normal',
-            'textAlign': 'center',
-            'padding': '6px 10px'
-        },
-        # Hardcode specific widths - doesnt seem respected
-        # style_cell_conditional=[
-        #     {'if': {'column_id': 'athlete'}, 'width': '25%'},
-        #     {'if': {'column_id': 'score'}, 'width': '10%'},
-        #     {'if': {'column_id': 'event'}, 'width': '30%'},
-        #     {'if': {'column_id': 'country'}, 'width': '15%'},
-        # ],
-
-        # page_size=20                      # optional pagination
+        table = dash_table.DataTable(
+            columns=[{"name": i, "id": i, "deletable": False} for i in df.columns],
+            data=df.to_dict('records'),
+            sort_action='native',            # allow sorting
+            filter_action='native',          # allow filtering
+            # style_data_conditional=style_data_conditional,
+            style_header={
+                'backgroundColor': '#cce7ff',
+                'fontWeight': 'bold',
+                'textAlign': 'center',
+            },
+            # IMPORTANT: try inline-block + width:auto on the table container
+            style_table={
+                'width': 'auto',            # let table width be its content width
+                'minWidth': '0',            # helps prevent flex/min-width issues
+                'overflowX': 'auto',
+                'display': 'inline-block',   # key: make table act like inline-block within wrapper
+                # style_as_list_view=True,
+            },
+        
+            # make cells size to content (use minWidth 0 to avoid forcing stretch)
+            style_cell={
+                'minWidth': '0px',
+                'width': 'auto',
+                'maxWidth': '200px',
+                'whiteSpace': 'normal',
+                'textAlign': 'center',
+                'padding': '6px 10px'
+            },
     )
-    
     return table
+
+# def update_table(database, competition, categories, results, apparatus, selected_athlete=None):
+#     table_data = get_category_data_for_competition_day(database, competition, categories, results, apparatus)
+    
+#     if not table_data:
+#         return dash_table.DataTable()  # empty table
+    
+#     df = pd.DataFrame.from_dict(table_data, orient='index')
+
+#     # Fill missing columns and NaNs
+#     expected_columns = ['Score', 'E', 'D', 'ND', 'Bonus', 'category', 'country']
+#     for col in expected_columns:
+#         if col not in df.columns:
+#             df[col] = 0.0
+
+#     df = df.fillna(0.0)
+    
+#     # Keep only rows with a valid D  score (not NaN or zero)
+#     # sometimes a legitimate score can be zero so best to check
+#     # df = df[(df['D'].notna() & (df['D'] != 0)) | (df['E'].notna() & (df['E'] != 0))]
+#     df = df[(df['D'].notna() & (df['D'] != 0))]
+
+#     # Format scores
+#     df['D score'] = df['D'].map('{:.3f}'.format)
+#     df['E score'] = df['E'].map('{:.3f}'.format)
+#     df['Score'] = df['Score'].map('{:.3f}'.format)
+#     if results == "average":
+#         df['ND'] = df['ND'].map('{:.2f}'.format)
+#         df['Bonus'] = df['Bonus'].map('{:.2f}'.format)
+#     else:
+#         df['ND'] = df['ND'].map('{:.1f}'.format)
+#         df['Bonus'] = df['Bonus'].map('{:.1f}'.format)
+
+#     # Add extra columns
+#     df['Category'] = df['category'].map(database['category_acronyms'])
+#     df['Country'] = df['country']
+#     df['Athlete name'] = df.index
+#     df['Rank'] = range(1, len(df) + 1)
+
+#     # Reorder columns
+#     df = df[['Rank', 'Athlete name', 'Country', 'Category', 'D score', 'E score', 'ND', 'Bonus', 'Score']]
+
+#     # Highlight selected athlete
+#     style_data_conditional = []
+#     if selected_athlete:
+#         style_data_conditional = [
+#             {
+#                 'if': {'filter_query': f'{{Athlete name}} = "{selected_athlete}"'},
+#                 'backgroundColor': 'yellow',
+#                 'fontWeight': 'bold'
+#             }
+#         ]
+
+#     # Generate HTML table with highlighted row if a selected athlete is provided
+#     #no longer works with filterable data fix #TODO
+#     table_rows = []
+#     for i in range(len(df)):
+#         row_data = df.iloc[i]
+#         background_color = 'yellow' if row_data['Athlete name'] == selected_athlete else ('white' if i % 2 == 0 else '#e6f2ff') #making it blue if not selected
+#         table_row = html.Tr(
+#             [html.Td(row_data[col], style={'background-color': background_color, 'padding': '10px'}) for col in df.columns]
+#         )
+#         table_rows.append(table_row)
+
+
+#     table = dash_table.DataTable(
+#         columns=[{"name": i, "id": i, "deletable": False} for i in df.columns],
+#         data=df.to_dict('records'),
+#         sort_action='native',            # allow sorting
+#         filter_action='native',          # allow filtering
+#         # style_data_conditional=style_data_conditional,
+#         style_header={
+#             'backgroundColor': '#cce7ff',
+#             'fontWeight': 'bold',
+#             'textAlign': 'center',
+#         },
+#         # IMPORTANT: try inline-block + width:auto on the table container
+#         style_table={
+#             'width': 'auto',            # let table width be its content width
+#             'minWidth': '0',            # helps prevent flex/min-width issues
+#             'overflowX': 'auto',
+#             'display': 'inline-block',   # key: make table act like inline-block within wrapper
+#             # style_as_list_view=True,
+#         },
+    
+#         # make cells size to content (use minWidth 0 to avoid forcing stretch)
+#         style_cell={
+#             'minWidth': '0px',
+#             'width': 'auto',
+#             'maxWidth': '200px',
+#             'whiteSpace': 'normal',
+#             'textAlign': 'center',
+#             'padding': '6px 10px'
+#         },
+#         # Hardcode specific widths - doesnt seem respected
+#         # style_cell_conditional=[
+#         #     {'if': {'column_id': 'athlete'}, 'width': '25%'},
+#         #     {'if': {'column_id': 'score'}, 'width': '10%'},
+#         #     {'if': {'column_id': 'event'}, 'width': '30%'},
+#         #     {'if': {'column_id': 'country'}, 'width': '15%'},
+#         # ],
+
+#         # page_size=20                      # optional pagination
+#     )
+    
+#     return table
 
 
 #quickly sort competition options by date
