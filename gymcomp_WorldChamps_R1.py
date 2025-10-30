@@ -2077,7 +2077,7 @@ app.layout = html.Div(
         dcc.Tabs(id='tabs-example', value='tab-1', children=[
             dcc.Tab(label='Competition Overview', value='tab-1'),
             dcc.Tab(label='Individual Athlete Analysis', value='tab-2'),
-            dcc.Tab(label='Team Scenarios', value='tab-3'),
+            # dcc.Tab(label='Team Scenarios', value='tab-3'),
         ]),
         html.Div(id='tabs-content')
     ]
