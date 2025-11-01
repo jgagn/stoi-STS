@@ -970,8 +970,8 @@ def update_plot_and_table(results, apparatus, categories, competition, clickData
 barplot_colours = {'D':
                        ['rgb(31, 119, 180)',  # Blue
                         'rgb(255, 127, 14)',  # Orange
-                        'rgb(44, 160, 44)',   # Green
-                        'rgb(214, 39, 40)',   # Red
+                        # 'rgb(44, 160, 44)',   # Green
+                        # 'rgb(214, 39, 40)',   # Red
                         'rgb(148, 103, 189)', # Purple
                         'rgb(140, 86, 75)',   # Brown
                         'rgb(227, 119, 194)'  # Pink
@@ -980,8 +980,8 @@ barplot_colours = {'D':
                    'E':
                        ['rgba(31, 119, 180, 0.5)',  # Light Blue
                         'rgba(255, 127, 14, 0.5)',  # Light Orange
-                        'rgba(44, 160, 44, 0.5)',   # Light Green
-                        'rgba(214, 39, 40, 0.5)',   # Light Red
+                        # 'rgba(44, 160, 44, 0.5)',   # Light Green
+                        # 'rgba(214, 39, 40, 0.5)',   # Light Red
                         'rgba(148, 103, 189, 0.5)', # Light Purple
                         'rgba(140, 86, 75, 0.5)',   # Light Brown
                         'rgba(227, 119, 194, 0.5)'  # Light Pink
