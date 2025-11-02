@@ -176,7 +176,9 @@ for comp in competitions:
 database = pd.concat(dfs, ignore_index=True)
 # Create new "Athlete" column by merging last and first names
 
-database['Athlete'] = database['Last Name'] + ' ' + database['First Name']
+#sometimes there is no first name...
+
+database['Athlete'] = database['Last Name'] + ' ' + database['First Name'].fillna("") 
 athletes = database['Athlete'].unique()
 
 #remove any non strings - should only be in my incompelte test data

@@ -95,7 +95,7 @@ with open(file_path, 'rb') as f:
 app = dash.Dash(__name__, suppress_callback_exceptions=True) #, external_stylesheets=[dbc.themes.MORPH])
 # app = dash.Dash(__name__,suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.MORPH])
 
-app.title = "STOI Demo"
+app.title = "MAG Tracker"
 
 # # Keep this out of source code repository - save in a file or a database
 # VALID_USERNAME_PASSWORD_PAIRS = {
